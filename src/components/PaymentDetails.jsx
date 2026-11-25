@@ -139,7 +139,7 @@ export const PaymentDetails = ({
         {/* 4. Action Buttons: Save Draft, Generate Bill, Print Invoice, Clear All */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '10px' }}>
-            {/* Generate Bill */}
+            {/* Save Bill */}
             <button
               type="button"
               className="btn btn-primary"
@@ -153,9 +153,10 @@ export const PaymentDetails = ({
                 justifyContent: 'center',
                 gap: '8px'
               }}
+              title="Save bill and record sale"
             >
-              <Printer size={18} />
-              <span>Generate Bill</span>
+              <Save size={18} />
+              <span>Save Bill</span>
             </button>
 
             {/* Print Invoice */}

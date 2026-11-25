@@ -46,25 +46,25 @@ export const InvoicePreview = ({
             <Receipt size={22} color="#2563eb" />
             <div>
               <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-                Crackers Shop Billing Invoice
+                Estimate Bill Preview
               </h3>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Invoice #{bill.invoiceNo} • {bill.date}
+                Estimate #{bill.invoiceNo?.split('-').pop() || bill.invoiceNo} • {bill.date}
               </span>
             </div>
           </div>
 
           <div className="invoice-modal-actions">
-            {/* Format Switcher: A4 Standard vs 80mm Thermal */}
+            {/* Format Switcher: Estimate vs 80mm Thermal */}
             <div className="format-switcher">
               <button
                 type="button"
                 className={`format-btn ${format === 'standard' ? 'active' : ''}`}
                 onClick={() => setFormat('standard')}
-                title="Switch to A4 Tax Invoice Format"
+                title="Switch to Estimate Bill Format"
               >
                 <FileText size={14} style={{ display: 'inline', marginRight: '5px' }} />
-                <span>A4 Tax Invoice</span>
+                <span>Estimate Bill</span>
               </button>
               <button
                 type="button"

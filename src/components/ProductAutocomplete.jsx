@@ -139,10 +139,10 @@ export const ProductAutocomplete = ({
         }}
       >
         <Search 
-          size={18} 
+          size={16} 
           style={{
             position: 'absolute',
-            left: '14px',
+            left: '11px',
             color: 'var(--accent)',
             pointerEvents: 'none',
             zIndex: 2
@@ -168,10 +168,10 @@ export const ProductAutocomplete = ({
           }}
           onKeyDown={handleKeyDown}
           style={{
-            paddingLeft: '44px',
-            paddingRight: '62px',
+            paddingLeft: '34px',
+            paddingRight: '48px',
             height: '44px',
-            fontSize: '0.925rem',
+            fontSize: '0.875rem',
             borderRadius: 'var(--radius-sm)',
             border: isOpen ? '1.5px solid var(--accent)' : '1.5px solid var(--border-dark)',
             boxShadow: isOpen ? '0 0 0 3px rgba(37, 99, 235, 0.2)' : 'var(--shadow-xs)',
@@ -324,59 +324,33 @@ export const ProductAutocomplete = ({
                       border: isActive ? '1px solid var(--border-hover)' : '1px solid transparent'
                     }}
                   >
-                    {/* Left: Thumbnail & Details */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {/* Product Image */}
-                      <div 
-                        style={{
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: 'var(--radius-xs)',
-                          overflow: 'hidden',
-                          background: 'var(--bg-page)',
-                          flexShrink: 0,
-                          border: '1px solid var(--border-light)'
-                        }}
-                      >
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80";
-                          }}
-                        />
+                    {/* Left: Product Name, Code & Details (No image) */}
+                    <div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.92rem', lineHeight: 1.25 }}>
+                        {product.name}
                       </div>
-
-                      {/* Name, Code & Unit */}
-                      <div>
-                        <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.9rem', lineHeight: 1.25 }}>
-                          {product.name}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
-                          <span 
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: '0.72rem',
-                              fontWeight: 700,
-                              color: 'var(--accent)',
-                              background: '#e0f2fe',
-                              padding: '1px 6px',
-                              borderRadius: 'var(--radius-xs)'
-                            }}
-                          >
-                            {product.code}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+                        <span 
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            color: 'var(--accent)',
+                            background: '#e0f2fe',
+                            padding: '1px 6px',
+                            borderRadius: 'var(--radius-xs)'
+                          }}
+                        >
+                          {product.code}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {product.unit || '1 Box'}
+                        </span>
+                        {product.discount > 0 && (
+                          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '1px 5px', borderRadius: '4px' }}>
+                            {product.discount}% OFF
                           </span>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            {product.unit || '1 Box'}
-                          </span>
-                          {product.discount > 0 && (
-                            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '1px 5px', borderRadius: '4px' }}>
-                              {product.discount}% OFF
-                            </span>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
 

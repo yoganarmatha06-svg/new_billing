@@ -5,6 +5,10 @@ export const BillSummary = ({
   summary = {}, 
   manualDiscount = 0, 
   onManualDiscountChange,
+  gstType = 'percent',
+  onGstTypeChange,
+  customGstValue = '18',
+  onCustomGstChange,
   onGenerateBill,
   onPrintInvoice,
   onSaveDraft,
@@ -84,10 +88,76 @@ export const BillSummary = ({
             </span>
           </div>
 
-          {/* 3. GST Amount */}
-          <div className="summary-line-item">
-            <span style={{ color: 'var(--text-secondary)' }}>GST Amount (18%)</span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent)' }}>
+          {/* 3. Editable GST Amount & Rate */}
+          <div className="summary-line-item" style={{ alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.825rem', fontWeight: 600 }}>
+                GST
+              </span>
+
+              {/* Mode Toggle: % or ₹ */}
+              {onGstTypeChange && (
+                <div style={{ display: 'inline-flex', borderRadius: '4px', border: '1px solid var(--border-dark)', overflow: 'hidden' }}>
+                  <button
+                    type="button"
+                    onClick={() => onGstTypeChange('percent')}
+                    title="Calculate GST by percentage (%)"
+                    style={{
+                      padding: '2px 8px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      background: gstType === 'percent' ? '#2563eb' : '#f8fafc',
+                      color: gstType === 'percent' ? '#ffffff' : 'var(--text-secondary)',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onGstTypeChange('amount')}
+                    title="Enter custom GST in rupees (₹)"
+                    style={{
+                      padding: '2px 8px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      background: gstType === 'amount' ? '#2563eb' : '#f8fafc',
+                      color: gstType === 'amount' ? '#ffffff' : 'var(--text-secondary)',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ₹
+                  </button>
+                </div>
+              )}
+
+              {/* Typeable GST Input Field */}
+              {onCustomGstChange ? (
+                <div className="manual-discount-input-group" style={{ gap: '2px' }}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    className="manual-disc-input"
+                    style={{ width: '65px', textAlign: 'right', fontWeight: 700, fontFamily: 'var(--font-mono)' }}
+                    placeholder={gstType === 'percent' ? '18' : '0.00'}
+                    value={customGstValue}
+                    onChange={(e) => onCustomGstChange(e.target.value)}
+                  />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {gstType === 'percent' ? '%' : '₹'}
+                  </span>
+                </div>
+              ) : (
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                  ({summary.gstRate ?? 18}%)
+                </span>
+              )}
+            </div>
+
+            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent)' }}>
               + ₹{gstAmount.toFixed(2)}
             </span>
           </div>
@@ -117,7 +187,7 @@ export const BillSummary = ({
           {(onGenerateBill || onPrintInvoice) && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid var(--border-light)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '10px' }}>
-                {/* Generate Bill Button */}
+                {/* Save Bill Button */}
                 <button
                   type="button"
                   className="btn btn-primary"
@@ -132,9 +202,10 @@ export const BillSummary = ({
                     gap: '8px',
                     boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
                   }}
+                  title="Save bill and record sale"
                 >
-                  <Printer size={18} />
-                  <span>Generate Bill</span>
+                  <Save size={18} />
+                  <span>Save Bill</span>
                 </button>
 
                 {/* Print Invoice Button */}

@@ -8,7 +8,8 @@ import {
 } from '../components';
 import { 
   generateInvoiceNumber, 
-  calculateBillSummary 
+  calculateBillSummary,
+  calculateItemTotals
 } from '../data/products';
 
 export const NewBilling = ({ 
@@ -45,10 +46,17 @@ export const NewBilling = ({
   // 4. Manual Overall Bill Discount
   const [manualDiscount, setManualDiscount] = useState(0);
 
-  // 5. Payment Details State
+  // 5. Custom GST Configuration (Typeable in Billing Summary)
+  const [gstType, setGstType] = useState('percent'); // 'percent' | 'amount'
+  const [customGstValue, setCustomGstValue] = useState('18');
+
+  // 6. Payment Details State
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [paymentStatus, setPaymentStatus] = useState('Paid');
   const [amountPaid, setAmountPaid] = useState(0);
+
+  // 7. Submission guard state (prevents duplicate sales records)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load draft if saved in localStorage
   useEffect(() => {
@@ -102,26 +110,33 @@ export const NewBilling = ({
 
   // Save Customer Handler (validates mobile upon saving)
   const handleSaveCustomer = () => {
-    const mobileTrimmed = (customer.mobile || '').trim();
-    if (mobileTrimmed && !/^[6-9]\d{9}$/.test(mobileTrimmed)) {
+    const rawMobile = customer.mobile || '';
+    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
+    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
       setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
       onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
       return;
     }
 
+    const customerToSave = {
+      ...customer,
+      mobile: cleanMobile || customer.mobile?.trim() || ''
+    };
+
     let savedRecord = null;
-    if (onSaveCustomer && (customer.name || customer.mobile)) {
-      savedRecord = onSaveCustomer(customer);
+    if (onSaveCustomer && (customerToSave.name || customerToSave.mobile)) {
+      savedRecord = onSaveCustomer(customerToSave);
     }
 
     if (!savedRecord) {
-      const existing = customers.find(c => c.mobile && c.mobile === (customer.mobile || '').trim());
+      const existing = customers.find(c => c.mobile && c.mobile === customerToSave.mobile);
       savedRecord = {
-        ...customer,
+        ...customerToSave,
         id: existing?.id || `CUST-${Math.floor(100000 + Math.random() * 900000)}`
       };
     }
 
+    setCustomer(customerToSave);
     setCustomerErrors(prev => {
       const next = { ...prev };
       delete next.mobile;
@@ -148,8 +163,11 @@ export const NewBilling = ({
 
   // Compute live billing summary
   const summary = useMemo(() => {
-    return calculateBillSummary(cartItems, manualDiscount, amountPaid);
-  }, [cartItems, manualDiscount, amountPaid]);
+    return calculateBillSummary(cartItems, manualDiscount, amountPaid, {
+      type: gstType,
+      value: customGstValue
+    });
+  }, [cartItems, manualDiscount, amountPaid, gstType, customGstValue]);
 
   // Sync default amount paid with grand total when grand total changes
   useEffect(() => {
@@ -276,7 +294,8 @@ export const NewBilling = ({
     });
 
     const finalAmountPaid = Number(amountPaid) > 0 ? Number(amountPaid) : summary.grandTotal;
-    const hasCustomerDetails = Boolean(customer.name?.trim() || customer.mobile?.trim());
+    const cleanMobile = (customer.mobile || '').replace(/\D/g, '').slice(-10);
+    const hasCustomerDetails = Boolean(customer.name?.trim() || cleanMobile);
 
     return {
       id: `bill-${Date.now()}`,
@@ -286,26 +305,40 @@ export const NewBilling = ({
       customer: {
         id: savedCustomerInfo?.id || (hasCustomerDetails ? `CUST-${Date.now().toString().slice(-6)}` : ''),
         name: customer.name?.trim() || '',
-        mobile: customer.mobile?.trim() || '',
+        mobile: cleanMobile || customer.mobile?.trim() || '',
         address: customer.address?.trim() || '',
         gstNo: customer.gstNo?.trim() || ''
       },
-      items: cartItems.map(item => ({
-        id: item.id,
-        code: item.code,
-        name: item.name,
-        category: item.category,
-        price: item.price,
-        quantity: item.quantity,
-        discount: item.discount,
-        gst: item.gst,
-        unit: item.unit
-      })),
+      items: cartItems.map(item => {
+        const qty = Number(item.quantity) || 1;
+        const price = Number(item.price) || 0;
+        const disc = Number(item.discount) || 0;
+        const gst = Number(item.gst) || 18;
+        const itemTotals = calculateItemTotals(price, qty, disc, gst);
+
+        return {
+          id: item.id,
+          code: item.code || '',
+          name: item.name,
+          category: item.category || 'General',
+          price: price,
+          quantity: qty,
+          discount: disc,
+          discountAmount: itemTotals.discountAmount,
+          taxableAmount: itemTotals.taxableAmount,
+          gst: gst,
+          gstAmount: itemTotals.gstAmount,
+          itemTotal: itemTotals.total,
+          total: itemTotals.total,
+          unit: item.unit || '1 Box'
+        };
+      }),
       summary: {
         itemsCount: summary.itemsCount,
         subtotal: summary.subtotal,
         totalDiscount: summary.totalDiscount,
         taxableAmount: summary.taxableAmount,
+        gstRate: summary.gstRate,
         gstAmount: summary.gstAmount,
         roundOff: summary.roundOff,
         grandTotal: summary.grandTotal,
@@ -339,60 +372,76 @@ export const NewBilling = ({
     }
   };
 
-  // Button 2: Generate Bill (Works with or without customer information)
+  // Button 2: Generate / Save Bill (Automatically records to Sales)
   const handleGenerateBill = () => {
+    if (isSubmitting) return;
+
     if (cartItems.length === 0) {
       onShowToast?.('Please add at least one cracker to the bill before generating', 'danger');
       return;
     }
 
-    const mobileTrimmed = (customer.mobile || '').trim();
-    if (mobileTrimmed && !/^[6-9]\d{9}$/.test(mobileTrimmed)) {
+    const rawMobile = customer.mobile || '';
+    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
+    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
       setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
       onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
       return;
     }
 
-    const newBill = buildInvoiceObject(invoiceNo);
+    setIsSubmitting(true);
 
-    // Save to App state & localStorage
-    onSaveBill?.(newBill);
+    try {
+      const newBill = buildInvoiceObject(invoiceNo);
 
-    // If customer details were entered, save them to the customers directory
-    if (newBill.customer.name && onSaveCustomer) {
-      onSaveCustomer(newBill.customer);
+      // Automatically save sales record permanently and update inventory
+      onSaveBill?.(newBill);
+
+      // If customer details were entered, save them to the customers directory
+      if (newBill.customer.name && onSaveCustomer) {
+        onSaveCustomer(newBill.customer);
+      }
+
+      // Clear saved draft
+      try {
+        localStorage.removeItem('sparkle_billing_draft');
+      } catch (e) {}
+
+      // Celebration confetti
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {}
+
+      onShowToast?.('Bill Saved Successfully', 'success');
+
+      // Show preview modal with the generated bill format
+      onViewInvoice?.(newBill);
+
+      // Reset for next bill with fresh invoice number
+      setInvoiceNo(generateInvoiceNumber());
+      setCustomer({ name: '', mobile: '', address: '', gstNo: '' });
+      setCustomerErrors({});
+      setIsCustomerSaved(false);
+      setSavedCustomerInfo(null);
+      setCartItems([]);
+      setManualDiscount(0);
+      setCustomGstValue('18');
+      setGstType('percent');
+      setAmountPaid(0);
+      setPaymentMethod('Cash');
+      setPaymentStatus('Paid');
+    } catch (err) {
+      console.error('Error generating bill:', err);
+      onShowToast?.('Failed to save bill. Please try again.', 'danger');
+    } finally {
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 500);
     }
-
-    // Clear saved draft
-    try {
-      localStorage.removeItem('sparkle_billing_draft');
-    } catch (e) {}
-
-    // Celebration confetti
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    } catch (e) {}
-
-    onShowToast?.(`Invoice ${invoiceNo} generated successfully!`, 'success');
-
-    // Show preview modal
-    onViewInvoice?.(newBill);
-
-    // Reset for next bill with fresh invoice number
-    setInvoiceNo(generateInvoiceNumber());
-    setCustomer({ name: '', mobile: '', address: '', gstNo: '' });
-    setCustomerErrors({});
-    setIsCustomerSaved(false);
-    setSavedCustomerInfo(null);
-    setCartItems([]);
-    setManualDiscount(0);
-    setAmountPaid(0);
-    setPaymentMethod('Cash');
-    setPaymentStatus('Paid');
   };
 
   // Button 3: Print Invoice (Works with or without customer information)
@@ -402,28 +451,29 @@ export const NewBilling = ({
       return;
     }
 
-    const mobileTrimmed = (customer.mobile || '').trim();
-    if (mobileTrimmed && !/^[6-9]\d{9}$/.test(mobileTrimmed)) {
+    const rawMobile = customer.mobile || '';
+    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
+    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
       setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
       onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
       return;
     }
 
-    const newBill = buildInvoiceObject(invoiceNo);
-    onSaveBill?.(newBill);
-
-    if (newBill.customer.name && onSaveCustomer) {
-      onSaveCustomer(newBill.customer);
-    }
-
     try {
-      localStorage.removeItem('sparkle_billing_draft');
-    } catch (e) {}
+      const newBill = buildInvoiceObject(invoiceNo);
 
-    onShowToast?.(`Ready to print invoice ${invoiceNo}`, 'info');
+      try {
+        localStorage.removeItem('sparkle_billing_draft');
+      } catch (e) {}
 
-    // Open print preview
-    onViewInvoice?.(newBill);
+      onShowToast?.(`Previewing invoice ${invoiceNo}`, 'info');
+
+      // Open print preview
+      onViewInvoice?.(newBill);
+    } catch (err) {
+      console.error('Error printing invoice:', err);
+      onShowToast?.('Failed to preview invoice. Please try again.', 'danger');
+    }
   };
 
   // Button 4: Clear All
@@ -460,10 +510,6 @@ export const NewBilling = ({
               <h2 className="unified-billing-title">Billing Form</h2>
               <span className="unified-billing-subtitle">Point of Sale • Counter #1</span>
             </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className="invoice-tag">#{invoiceNo}</span>
-            <span className="items-badge">{cartItems.length} Products</span>
           </div>
         </div>
 
@@ -505,6 +551,10 @@ export const NewBilling = ({
               summary={summary}
               manualDiscount={manualDiscount}
               onManualDiscountChange={setManualDiscount}
+              gstType={gstType}
+              onGstTypeChange={setGstType}
+              customGstValue={customGstValue}
+              onCustomGstChange={setCustomGstValue}
               onGenerateBill={handleGenerateBill}
               onPrintInvoice={handlePrintInvoice}
               onSaveDraft={handleSaveDraft}

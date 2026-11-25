@@ -403,26 +403,15 @@ export const BillingTable = ({
                         {index + 1}
                       </td>
 
-                      {/* 2. Product Name with image & code */}
+                      {/* 2. Product Name with code */}
                       <td style={{ padding: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80";
-                            }}
-                          />
-                          <div>
-                            <div className="item-name-cell" title={item.name} style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.875rem' }}>
-                              {item.name}
-                            </div>
-                            <span className="item-code-badge" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                              {item.code} • Stock: {maxStock}
-                            </span>
+                        <div>
+                          <div className="item-name-cell" title={item.name} style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.875rem' }}>
+                            {item.name}
                           </div>
+                          <span className="item-code-badge" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                            {item.code} • Stock: {maxStock}
+                          </span>
                         </div>
                       </td>
 

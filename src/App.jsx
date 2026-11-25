@@ -19,6 +19,7 @@ import {
   INITIAL_CUSTOMERS, 
   INITIAL_BILLS 
 } from './data/products';
+import { salesService } from './services/salesService';
 
 import './styles/global.css';
 import './styles/components.css';
@@ -29,14 +30,9 @@ export function App() {
   // Navigation active page
   const [activePage, setActivePage] = useState('dashboard');
 
-  // LocalStorage persistence for Bills
+  // Permanent Database & LocalStorage persistence for Bills
   const [bills, setBills] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sparkle_bills');
-      return saved ? JSON.parse(saved) : INITIAL_BILLS;
-    } catch (e) {
-      return INITIAL_BILLS;
-    }
+    return salesService.getSales();
   });
 
   // LocalStorage persistence for Products
@@ -75,13 +71,9 @@ export function App() {
   // Toast notification state
   const [toast, setToast] = useState(null);
 
-  // Persist bills whenever updated
+  // Persist bills to database / storage whenever updated
   useEffect(() => {
-    try {
-      localStorage.setItem('sparkle_bills', JSON.stringify(bills));
-    } catch (e) {
-      console.error('Failed to save bills to localStorage', e);
-    }
+    salesService.saveAllSales(bills);
   }, [bills]);
 
   // Persist products whenever updated
@@ -112,33 +104,42 @@ export function App() {
 
   // Handler when a new bill is generated
   const handleSaveBill = (newBill) => {
-    // 1. Add to bills list
-    setBills((prev) => [newBill, ...prev]);
+    if (!newBill || !newBill.invoiceNo) return;
 
-    // 2. Decrement inventory stock for billed products
+    // 1. Synchronously persist to localStorage and update bills state
+    const updatedSales = salesService.saveSale(newBill);
+    setBills(updatedSales);
+
+    // 2. Decrement inventory stock for billed products automatically
     if (newBill.items && newBill.items.length > 0) {
-      setProducts((prevProds) =>
-        prevProds.map((p) => {
+      setProducts((prevProds) => {
+        const updated = prevProds.map((p) => {
           const billedItem = newBill.items.find((item) => item.id === p.id);
           if (billedItem) {
             const newStock = Math.max(0, p.stock - (billedItem.quantity || 1));
             return { ...p, stock: newStock };
           }
           return p;
-        })
-      );
+        });
+        try {
+          localStorage.setItem('sparkle_products', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     }
 
     // 3. Update or create customer record
     if (newBill.customer?.mobile) {
       setCustomers((prevCusts) => {
+        const cleanMobile = newBill.customer.mobile.trim();
         const existingIdx = prevCusts.findIndex(
-          (c) => c.mobile === newBill.customer.mobile
+          (c) => c.mobile === cleanMobile
         );
         const grandTotal = newBill.summary?.grandTotal || 0;
+        let updated;
 
         if (existingIdx > -1) {
-          const updated = [...prevCusts];
+          updated = [...prevCusts];
           const current = updated[existingIdx];
           updated[existingIdx] = {
             ...current,
@@ -149,20 +150,23 @@ export function App() {
             billsCount: (current.billsCount || 0) + 1,
             lastPurchase: newBill.date
           };
-          return updated;
         } else {
           const newCustRecord = {
             id: `cust-${Date.now()}`,
             name: newBill.customer.name || 'Counter Customer',
-            mobile: newBill.customer.mobile,
+            mobile: cleanMobile,
             address: newBill.customer.address || '',
             gstNo: newBill.customer.gstNo || '',
             totalPurchases: grandTotal,
             billsCount: 1,
             lastPurchase: newBill.date
           };
-          return [newCustRecord, ...prevCusts];
+          updated = [newCustRecord, ...prevCusts];
         }
+        try {
+          localStorage.setItem('sparkle_customers', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
       });
     }
   };
@@ -174,18 +178,23 @@ export function App() {
 
     // Restore product stock if items exist
     if (billToDelete.items && billToDelete.items.length > 0) {
-      setProducts((prevProds) =>
-        prevProds.map((p) => {
+      setProducts((prevProds) => {
+        const updated = prevProds.map((p) => {
           const item = billToDelete.items.find((i) => i.id === p.id);
           if (item) {
             return { ...p, stock: (p.stock || 0) + (Number(item.quantity) || 1) };
           }
           return p;
-        })
-      );
+        });
+        try {
+          localStorage.setItem('sparkle_products', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     }
 
-    setBills((prev) => prev.filter((b) => b.id !== billId && b.invoiceNo !== billId));
+    const updated = salesService.deleteSale(billId);
+    setBills(updated);
     showToast(`Invoice #${billToDelete.invoiceNo} deleted & stock restored`, 'info');
   };
 

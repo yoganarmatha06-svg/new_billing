@@ -1,4 +1,5 @@
 import React from 'react';
+import { Phone, Mail } from 'lucide-react';
 import { SHOP_DETAILS } from '../data/products';
 
 // Helper: Convert number to Indian currency words
@@ -30,11 +31,32 @@ export const numberToWords = (num) => {
   return str.trim() + ' Rupees Only';
 };
 
+// Format date to DD-MM-YYYY (e.g., 20-11-2026)
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = String(dateStr).split('T')[0].split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
+
+// Extract or format clean estimate number (e.g. 1001)
+const getEstimateNo = (invNo) => {
+  if (!invNo) return '1001';
+  if (/^\d+$/.test(invNo)) return invNo;
+  const parts = String(invNo).split('-');
+  if (parts.length > 1) {
+    return parts[parts.length - 1];
+  }
+  return invNo;
+};
+
 export const PrintBill = ({ bill, format = 'standard' }) => {
   if (!bill) return null;
 
   const {
-    invoiceNo = 'INV-0000',
+    invoiceNo = 'INV-1001',
     date = new Date().toISOString().split('T')[0],
     time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
     customer = {},
@@ -44,7 +66,6 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
   } = bill;
 
   const isPaid = payment.status === 'Paid';
-  const hasCustomer = Boolean(customer.name?.trim() || customer.mobile?.trim() || customer.address?.trim());
 
   // --------------------------------------------------------------------------
   // 1. 80mm Thermal Slip Layout
@@ -54,55 +75,44 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
       <div className="thermal-receipt print-area-wrapper">
         {/* Header */}
         <div className="thermal-center">
-          <img 
-            src="/billing-logo.jpg" 
-            alt="Shop Logo" 
-            style={{ width: '44px', height: 'auto', marginBottom: '4px', objectFit: 'contain' }} 
-          />
           <div className="thermal-shop-name">{SHOP_DETAILS.name}</div>
-          <div style={{ fontSize: '10px', color: '#444' }}>{SHOP_DETAILS.tagline}</div>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#111' }}>{SHOP_DETAILS.tagline}</div>
           <div style={{ fontSize: '9px', marginTop: '2px', color: '#333' }}>{SHOP_DETAILS.address}</div>
           <div style={{ fontSize: '9px', color: '#333' }}>Ph: {SHOP_DETAILS.phone}</div>
-          <div style={{ fontSize: '9px', color: '#333' }}>GSTIN: {SHOP_DETAILS.gstin} | Lic: {SHOP_DETAILS.licenseNo}</div>
+          <div style={{ fontSize: '9px', color: '#333' }}>Email: {SHOP_DETAILS.email}</div>
         </div>
 
         <div className="thermal-divider-double"></div>
 
-        <div className="thermal-center" style={{ fontWeight: 800, fontSize: '12px', letterSpacing: '0.05em' }}>
-          TAX INVOICE / CASH MEMO
+        <div className="thermal-center" style={{ fontWeight: 900, fontSize: '13px', letterSpacing: '0.05em', textDecoration: 'underline' }}>
+          Estimate
         </div>
 
         <div className="thermal-divider"></div>
 
         {/* Invoice Meta */}
         <div className="thermal-row">
-          <span>Inv No:</span>
-          <strong>#{invoiceNo}</strong>
+          <span>Estimate No:</span>
+          <strong>{getEstimateNo(invoiceNo)}</strong>
         </div>
         <div className="thermal-row">
-          <span>Date & Time:</span>
-          <span>{date} {time}</span>
+          <span>Date:</span>
+          <span>{formatDate(date)}</span>
         </div>
         <div className="thermal-row">
           <span>Customer:</span>
-          <strong>{customer.name?.trim() || 'Walk-in Customer'}</strong>
+          <strong>{customer.name?.trim() ? customer.name.trim().toUpperCase() : 'CASH CUSTOMER'}</strong>
         </div>
-        {customer.mobile?.trim() && (
-          <div className="thermal-row">
-            <span>Mobile:</span>
-            <span>+91 {customer.mobile}</span>
-          </div>
-        )}
         {customer.address?.trim() && (
           <div className="thermal-row">
             <span>Address:</span>
             <span>{customer.address}</span>
           </div>
         )}
-        {customer.gstNo?.trim() && (
+        {customer.mobile?.trim() && (
           <div className="thermal-row">
-            <span>Cust GSTIN:</span>
-            <span>{customer.gstNo}</span>
+            <span>Mobile:</span>
+            <span>{customer.mobile.trim().length === 10 ? `0${customer.mobile.trim()}` : customer.mobile.trim()}</span>
           </div>
         )}
 
@@ -110,32 +120,28 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
 
         {/* Products Table */}
         <div className="thermal-row" style={{ fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '3px' }}>
-          <span style={{ flex: 2 }}>Item Description</span>
-          <span style={{ width: '32px', textAlign: 'center' }}>Qty</span>
-          <span style={{ width: '45px', textAlign: 'right' }}>Rate</span>
-          <span style={{ width: '38px', textAlign: 'center' }}>Disc</span>
-          <span style={{ width: '55px', textAlign: 'right' }}>Total</span>
+          <span style={{ width: '24px' }}>#</span>
+          <span style={{ flex: 2 }}>Product</span>
+          <span style={{ width: '30px', textAlign: 'center' }}>Qty</span>
+          <span style={{ width: '48px', textAlign: 'right' }}>Rate</span>
+          <span style={{ width: '56px', textAlign: 'right' }}>Total</span>
         </div>
 
         <div style={{ marginTop: '4px' }}>
           {items.map((item, idx) => {
-            const qty = item.quantity || 1;
+            const qty = Number(item.quantity) || 1;
             const price = Number(item.price) || 0;
-            const gross = price * qty;
-            const discountAmt = gross * ((item.discount || 0) / 100);
-            const taxable = gross - discountAmt;
-            const gstAmt = taxable * ((item.gst || 18) / 100);
-            const itemTotal = taxable + gstAmt;
+            const disc = Number(item.discount) || 0;
+            const total = price * qty - (price * qty * (disc / 100));
 
             return (
               <div key={idx} className="thermal-item">
-                <div className="thermal-item-title">{idx + 1}. {item.name}</div>
-                <div className="thermal-row" style={{ color: '#222' }}>
-                  <span style={{ flex: 2, fontSize: '9.5px', color: '#555' }}>[{item.code || `CRK-${idx + 1}`}]</span>
-                  <span style={{ width: '32px', textAlign: 'center' }}>{qty}</span>
-                  <span style={{ width: '45px', textAlign: 'right' }}>{price}</span>
-                  <span style={{ width: '38px', textAlign: 'center' }}>{item.discount ? `${item.discount}%` : '-'}</span>
-                  <span style={{ width: '55px', textAlign: 'right', fontWeight: 700 }}>₹{itemTotal.toFixed(0)}</span>
+                <div className="thermal-row" style={{ color: '#000', padding: '2px 0' }}>
+                  <span style={{ width: '24px' }}>{idx + 1}</span>
+                  <span style={{ flex: 2, fontWeight: 600 }}>{item.name}</span>
+                  <span style={{ width: '30px', textAlign: 'center', fontWeight: 700 }}>{qty}</span>
+                  <span style={{ width: '48px', textAlign: 'right' }}>{price}</span>
+                  <span style={{ width: '56px', textAlign: 'right', fontWeight: 700 }}>₹{total.toFixed(0)}</span>
                 </div>
               </div>
             );
@@ -146,385 +152,209 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
 
         {/* Totals Summary */}
         <div className="thermal-row">
-          <span>Gross Subtotal:</span>
+          <span>Sub Total:</span>
           <span>₹{(summary.subtotal || 0).toFixed(2)}</span>
         </div>
         <div className="thermal-row">
-          <span>Total Discount:</span>
+          <span>Discount:</span>
           <span>- ₹{(summary.totalDiscount || 0).toFixed(2)}</span>
         </div>
         <div className="thermal-row">
-          <span>Taxable Value:</span>
-          <span>₹{(summary.taxableAmount || 0).toFixed(2)}</span>
+          <span>Packing:</span>
+          <span>₹0.00</span>
         </div>
-        <div className="thermal-row">
-          <span>CGST (9%):</span>
-          <span>+ ₹{((summary.gstAmount || 0) / 2).toFixed(2)}</span>
-        </div>
-        <div className="thermal-row">
-          <span>SGST (9%):</span>
-          <span>+ ₹{((summary.gstAmount || 0) / 2).toFixed(2)}</span>
-        </div>
-        {summary.roundOff !== 0 && (
-          <div className="thermal-row">
-            <span>Round Off:</span>
-            <span>₹{summary.roundOff}</span>
-          </div>
-        )}
 
         <div className="thermal-divider-double"></div>
 
         <div className="thermal-row" style={{ fontSize: '13px', fontWeight: 900 }}>
-          <span>NET PAYABLE:</span>
-          <span>₹{(summary.grandTotal || 0).toLocaleString('en-IN')}</span>
-        </div>
-
-        <div className="thermal-divider"></div>
-
-        {/* Payment & Status */}
-        <div className="thermal-row">
-          <span>Payment Mode:</span>
-          <strong>{payment.method || 'Cash'}</strong>
-        </div>
-        <div className="thermal-row">
-          <span>Payment Status:</span>
-          <strong style={{ color: isPaid ? '#15803d' : '#b45309' }}>
-            {payment.status || 'Paid'}
-          </strong>
-        </div>
-        <div className="thermal-row">
-          <span>Amount Paid:</span>
-          <span>₹{summary.paidAmount ?? summary.grandTotal}</span>
-        </div>
-        {summary.balanceAmount > 0 && (
-          <div className="thermal-row" style={{ color: '#dc2626', fontWeight: 700 }}>
-            <span>Balance Due:</span>
-            <span>₹{summary.balanceAmount}</span>
-          </div>
-        )}
-
-        {/* Barcode & Thank you */}
-        <div className="thermal-barcode">
-          <div className="barcode-stripes"></div>
-          <span style={{ fontSize: '9px', letterSpacing: '0.1em' }}>*{invoiceNo}*</span>
+          <span>Net Amount:</span>
+          <span>₹{(summary.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
 
         <div className="thermal-divider"></div>
 
         <div className="thermal-center" style={{ fontSize: '9px', marginTop: '6px', lineHeight: '1.4' }}>
           <p style={{ fontWeight: 800, fontSize: '10px' }}>✨ HAPPY & SAFE DIWALI! ✨</p>
-          <p>Thank you for shopping with us! Visit again!</p>
-          <p>Goods once sold will not be taken back.</p>
-          <p>Always burst crackers outdoors under adult supervision.</p>
+          <p>Thank you for your visit!</p>
         </div>
       </div>
     );
   }
 
   // --------------------------------------------------------------------------
-  // 2. Standard Professional A4 GST Tax Invoice
+  // 2. Official Sivakasi "Estimate" Bill Format (Matches Uploaded Format 100%)
   // --------------------------------------------------------------------------
+  const estimateNo = getEstimateNo(invoiceNo);
+  const formattedDate = formatDate(date);
+  const customerName = customer.name?.trim() ? customer.name.trim().toUpperCase() : 'CASH CUSTOMER';
+  const customerAddress = customer.address?.trim() || '';
+  const customerPhone = customer.mobile?.trim()
+    ? (customer.mobile.trim().length === 10 ? `0${customer.mobile.trim()}` : customer.mobile.trim())
+    : '';
+
+  const subTotal = summary.subtotal !== undefined
+    ? Number(summary.subtotal)
+    : items.reduce((acc, it) => acc + (Number(it.price) || 0) * (Number(it.quantity) || 1), 0);
+
+  const discountAmount = Number(summary.totalDiscount) || 0;
+  const discountPercent = subTotal > 0 && discountAmount > 0
+    ? Math.round((discountAmount / subTotal) * 100)
+    : 0;
+
+  const netAmount = summary.grandTotal !== undefined
+    ? Number(summary.grandTotal)
+    : Math.max(0, subTotal - discountAmount);
+
   return (
-    <div className="tax-invoice-sheet print-area-wrapper">
-      {/* Paid / Unpaid Watermark */}
-      <div className={`status-watermark ${isPaid ? 'watermark-paid' : 'watermark-unpaid'}`}>
-        {payment.status || 'PAID'}
-      </div>
+    <div className="estimate-bill-sheet print-area-wrapper">
+      <div className="estimate-box">
+        {/* Top Header Block */}
+        <div className="estimate-header-grid">
+          {/* Shop Name & Address (Left) */}
+          <div className="estimate-shop-info" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '68px', padding: '10px 14px' }}>
+            <h1 className="estimate-shop-name" style={{ fontSize: '22px', fontWeight: 900, letterSpacing: '1px', margin: 0, textTransform: 'uppercase' }}>
+              {SHOP_DETAILS.name || 'NEW BILLING'}
+            </h1>
+          </div>
 
-      {/* Top Shop Banner */}
-      <div className="invoice-top-strip">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img 
-            src="/billing-logo.jpg" 
-            alt="Shop Logo" 
-            style={{ 
-              width: '74px', 
-              height: '74px', 
-              borderRadius: '8px', 
-              objectFit: 'contain',
-              border: '1.5px solid var(--border-light)',
-              padding: '2px',
-              background: '#ffffff'
-            }}
-          />
-          <div className="shop-title">
-            <h2>{SHOP_DETAILS.name}</h2>
-            <div className="shop-tagline">{SHOP_DETAILS.tagline}</div>
-            <div className="shop-meta-text">
-              <div>{SHOP_DETAILS.address}</div>
-              <div><strong>Phone:</strong> {SHOP_DETAILS.phone} • <strong>Email:</strong> {SHOP_DETAILS.email}</div>
-              <div><strong>GSTIN:</strong> {SHOP_DETAILS.gstin} • <strong>PESO Lic:</strong> {SHOP_DETAILS.licenseNo}</div>
+          {/* Contact Details (Right) */}
+          <div className="estimate-contact-info">
+            <div className="estimate-contact-row">
+              <Phone size={13} className="estimate-icon" />
+              <div>
+                <div>{SHOP_DETAILS.phone || '9988765543'}</div>
+              </div>
+            </div>
+
+            <div className="estimate-contact-row" style={{ marginTop: '8px' }}>
+              <Mail size={13} className="estimate-icon" />
+              <div style={{ wordBreak: 'break-all' }}>{SHOP_DETAILS.email || 'newbillng@gmail.com'}</div>
             </div>
           </div>
         </div>
 
-        <div className="invoice-badge-title">
-          <h1>TAX INVOICE</h1>
-          <div className="invoice-no-display">
-            #{invoiceNo}
-          </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Original for Recipient
-          </div>
-          <div style={{ marginTop: '6px' }}>
-            <span className={`badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}`}>
-              ● {payment.status || 'Paid'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Details Grid: Customer (Billed To) & Invoice Meta */}
-      <div className="invoice-details-grid">
-        {/* Customer Information (Left) */}
-        <div className="invoice-info-col">
-          <h4>Billed To (Customer Details)</h4>
-          {hasCustomer ? (
-            <>
-              <div className="invoice-info-row">
-                <span>Customer Name:</span>
-                <strong>{customer.name?.trim() || 'Walk-in Customer'}</strong>
-              </div>
-              <div className="invoice-info-row">
-                <span>Mobile Number:</span>
-                <span>{customer.mobile?.trim() ? `+91 ${customer.mobile.trim()}` : '—'}</span>
-              </div>
-              {customer.address?.trim() && (
-                <div className="invoice-info-row">
-                  <span>Address:</span>
-                  <span>{customer.address.trim()}</span>
-                </div>
-              )}
-              {customer.gstNo?.trim() ? (
-                <div className="invoice-info-row">
-                  <span>GSTIN:</span>
-                  <strong style={{ fontFamily: 'var(--font-mono)' }}>{customer.gstNo.trim()}</strong>
-                </div>
-              ) : (
-                <div className="invoice-info-row">
-                  <span>Customer Type:</span>
-                  <span style={{ color: 'var(--text-muted)' }}>Consumer / Retail</span>
-                </div>
-              )}
-              <div className="invoice-info-row">
-                <span>State & Code:</span>
-                <span>Tamil Nadu (33)</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="invoice-info-row">
-                <span>Customer:</span>
-                <strong>Walk-in Customer (Cash Sale)</strong>
-              </div>
-              <div className="invoice-info-row">
-                <span>Mobile:</span>
-                <span style={{ color: 'var(--text-muted)' }}>— (Optional / Not Provided)</span>
-              </div>
-              <div className="invoice-info-row">
-                <span>Sale Type:</span>
-                <span>Over-the-counter Retail Sale</span>
-              </div>
-              <div className="invoice-info-row">
-                <span>State & Code:</span>
-                <span>Tamil Nadu (33)</span>
-              </div>
-            </>
-          )}
+        {/* Estimate Title Bar */}
+        <div className="estimate-title-bar">
+          <span>Estimate</span>
         </div>
 
-        {/* Invoice Meta (Right) */}
-        <div className="invoice-info-col">
-          <h4>Invoice & Payment Meta</h4>
-          <div className="invoice-info-row">
-            <span>Invoice No:</span>
-            <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>#{invoiceNo}</strong>
+        {/* Customer & Estimate Meta Row */}
+        <div className="estimate-meta-grid">
+          {/* Customer Details (Left) */}
+          <div className="estimate-customer-box">
+            <div className="estimate-customer-to-row">
+              <span className="estimate-to-badge">To</span>
+              <span className="estimate-customer-name">
+                {customerName}
+              </span>
+            </div>
+            {customerAddress && (
+              <div className="estimate-customer-sub">
+                {customerAddress}
+              </div>
+            )}
+            {customerPhone && (
+              <div className="estimate-customer-sub estimate-customer-phone">
+                {customerPhone}
+              </div>
+            )}
           </div>
-          <div className="invoice-info-row">
-            <span>Billing Date:</span>
-            <strong>{date}</strong>
-          </div>
-          <div className="invoice-info-row">
-            <span>Billing Time:</span>
-            <span>{time}</span>
-          </div>
-          <div className="invoice-info-row">
-            <span>Payment Mode:</span>
-            <strong>{payment.method || 'Cash'}</strong>
-          </div>
-          <div className="invoice-info-row">
-            <span>Payment Status:</span>
-            <strong style={{ color: isPaid ? 'var(--success)' : 'var(--warning)' }}>
-              {payment.status || 'Paid'}
-            </strong>
-          </div>
-          <div className="invoice-info-row">
-            <span>Place of Supply:</span>
-            <span>Sivakasi, Tamil Nadu</span>
+
+          {/* Estimate No & Date (Right) */}
+          <div className="estimate-no-date-box">
+            <div className="estimate-meta-row">
+              <span className="estimate-meta-label">Estimate No:</span>
+              <span className="estimate-meta-val">{estimateNo}</span>
+            </div>
+            <div className="estimate-meta-row">
+              <span className="estimate-meta-label">Date :</span>
+              <span className="estimate-meta-val">{formattedDate}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Product Items Table */}
-      <table className="invoice-table">
-        <thead>
-          <tr>
-            <th style={{ width: '36px', textAlign: 'center' }}>#</th>
-            <th>Product Name & Description</th>
-            <th style={{ width: '80px', textAlign: 'center' }}>Code</th>
-            <th className="text-center" style={{ width: '55px' }}>Qty</th>
-            <th className="text-right" style={{ width: '80px' }}>Rate (₹)</th>
-            <th className="text-center" style={{ width: '65px' }}>Disc %</th>
-            <th className="text-right" style={{ width: '85px' }}>Taxable (₹)</th>
-            <th className="text-right" style={{ width: '80px' }}>GST 18%</th>
-            <th className="text-right" style={{ width: '95px' }}>Amount (₹)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, idx) => {
-            const qty = item.quantity || 1;
-            const price = Number(item.price) || 0;
-            const gross = price * qty;
-            const discountAmt = gross * ((item.discount || 0) / 100);
-            const taxable = gross - discountAmt;
-            const gstAmt = taxable * ((item.gst || 18) / 100);
-            const itemTotal = taxable + gstAmt;
-
-            return (
-              <tr key={idx}>
-                <td style={{ textAlign: 'center', color: 'var(--text-light)' }}>{idx + 1}</td>
-                <td>
-                  <strong style={{ color: 'var(--text-heading)', display: 'block', fontSize: '0.825rem' }}>
-                    {item.name}
-                  </strong>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    {item.category || 'Crackers'} • {item.unit || '1 Box'}
-                  </div>
-                </td>
-                <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', textAlign: 'center' }}>
-                  {item.code || `CRK-${idx + 1}`}
-                </td>
-                <td className="text-center" style={{ fontWeight: 700 }}>{qty}</td>
-                <td className="text-right" style={{ fontFamily: 'var(--font-mono)' }}>₹{price.toFixed(2)}</td>
-                <td className="text-center">{item.discount ? `${item.discount}%` : '0%'}</td>
-                <td className="text-right" style={{ fontFamily: 'var(--font-mono)' }}>₹{taxable.toFixed(2)}</td>
-                <td className="text-right" style={{ fontFamily: 'var(--font-mono)' }}>₹{gstAmt.toFixed(2)}</td>
-                <td className="text-right" style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                  ₹{itemTotal.toFixed(2)}
-                </td>
+        {/* Product Table */}
+        <div className="estimate-table-wrapper">
+          <table className="estimate-table">
+            <thead>
+              <tr>
+                <th style={{ width: '6%', textAlign: 'center' }}>S.No.</th>
+                <th style={{ width: '8%', textAlign: 'center' }}>Code</th>
+                <th style={{ width: '48%', textAlign: 'center' }}>Product</th>
+                <th style={{ width: '6%', textAlign: 'center' }}>Qty</th>
+                <th style={{ width: '16%', textAlign: 'center' }}>Rate (Rs.) / Content</th>
+                <th style={{ width: '16%', textAlign: 'center' }}>Total ₹</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => {
+                const qty = Number(item.quantity) || 1;
+                const price = Number(item.price) || 0;
+                const disc = Number(item.discount) || 0;
+                const gross = price * qty;
+                const itemTotal = gross - (gross * (disc / 100));
+                const code = item.code ? (item.code.replace(/^[^\d]*-?/, '') || item.code) : String(idx + 1);
+                const unit = item.unit ? item.unit.replace(/^1\s*/i, '') : 'Box';
 
-      {/* Invoice Bottom: Terms / Thank You & Totals */}
-      <div className="invoice-bottom-grid">
-        {/* Left Column: Amount in Words, Greetings, Safety Notice & Terms */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Amount in words */}
-          <div className="amount-words-box">
-            <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>
-              Amount Chargeable (in words):
-            </span>
-            <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.82rem', marginTop: '2px' }}>
-              {numberToWords(summary.grandTotal || 0)}
-            </div>
-          </div>
+                return (
+                  <tr key={idx} className="estimate-item-row">
+                    <td style={{ textAlign: 'center' }}>{idx + 1}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 800 }}>{code}</td>
+                    <td style={{ textAlign: 'left', paddingLeft: '8px' }}>{item.name}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 800 }}>{qty}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 700 }}>
+                      {price} / {unit}
+                    </td>
+                    <td style={{ textAlign: 'right', paddingRight: '10px', fontWeight: 700 }}>
+                      {itemTotal.toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })}
 
-          {/* Thank you note */}
-          <div className="thank-you-card">
-            <div style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '0.85rem', marginBottom: '3px' }}>
-              ✨ Thank You for Shopping with Us! ✨
-            </div>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-main)', lineHeight: 1.4 }}>
-              We appreciate your business and wish you and your family a safe, spark-filled, and prosperous Diwali!
-            </p>
-          </div>
-
-          {/* Safety Notice */}
-          <div className="safety-warning-box">
-            <div style={{ fontWeight: 700, fontSize: '0.74rem', color: '#b45309', marginBottom: '2px' }}>
-              ⚠️ PESO Safety Instructions:
-            </div>
-            <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.7rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-              <li>Store crackers in a cool, dry place away from heat & fire.</li>
-              <li>Burst fireworks outdoors only under adult supervision.</li>
-              <li>Always keep a bucket of clean water and sand nearby for emergency.</li>
-            </ul>
-          </div>
-
-          {/* Terms & Conditions */}
-          <div className="terms-box">
-            <h5>Terms & Conditions:</h5>
-            <p>{SHOP_DETAILS.terms}</p>
-          </div>
+              {/* Stretch vertical border lines downwards like the original estimate sheet */}
+              <tr className="estimate-filler-row">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        {/* Right Column: Totals Breakup Card & Signature */}
-        <div>
-          <div className="invoice-totals-box">
-            <div className="totals-row">
-              <span>Gross Subtotal:</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>₹{(summary.subtotal || 0).toFixed(2)}</span>
-            </div>
-
-            <div className="totals-row" style={{ color: 'var(--accent)' }}>
-              <span>Total Discount:</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>- ₹{(summary.totalDiscount || 0).toFixed(2)}</span>
-            </div>
-
-            <div className="totals-row">
-              <span>Taxable Amount:</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>₹{(summary.taxableAmount || 0).toFixed(2)}</span>
-            </div>
-
-            <div className="totals-row">
-              <span>CGST (9%):</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>₹{((summary.gstAmount || 0) / 2).toFixed(2)}</span>
-            </div>
-
-            <div className="totals-row">
-              <span>SGST (9%):</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>₹{((summary.gstAmount || 0) / 2).toFixed(2)}</span>
-            </div>
-
-            {summary.roundOff !== 0 && (
-              <div className="totals-row" style={{ fontSize: '0.75rem' }}>
-                <span>Round Off:</span>
-                <span style={{ fontFamily: 'var(--font-mono)' }}>₹{summary.roundOff}</span>
-              </div>
-            )}
-
-            <div className="totals-row grand-total-row">
-              <span>Grand Total:</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>
-                ₹{(summary.grandTotal || 0).toLocaleString('en-IN')}
-              </span>
-            </div>
-
-            <div className="totals-row" style={{ marginTop: '10px', fontSize: '0.8rem' }}>
-              <span>Amount Paid:</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                ₹{(summary.paidAmount ?? summary.grandTotal).toLocaleString('en-IN')}
-              </span>
-            </div>
-
-            {summary.balanceAmount > 0 && (
-              <div className="totals-row" style={{ color: 'var(--danger)', fontWeight: 700 }}>
-                <span>Balance Due:</span>
-                <span style={{ fontFamily: 'var(--font-mono)' }}>₹{summary.balanceAmount.toLocaleString('en-IN')}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Authorized Signature Block */}
-          <div className="sign-area">
-            <div className="sign-line"></div>
-            <div>For <strong>{SHOP_DETAILS.name}</strong></div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '2px' }}>
-              Authorized Signatory / Cashier
-            </div>
+        {/* Summary Block at Bottom Right */}
+        <div className="estimate-summary-container">
+          <div className="estimate-summary-blank-space"></div>
+          <div className="estimate-summary-table-box">
+            <table className="estimate-summary-table">
+              <tbody>
+                <tr>
+                  <td className="estimate-sum-label">Sub Total</td>
+                  <td className="estimate-sum-val">
+                    {subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="estimate-sum-label">Discount ({discountPercent}%)</td>
+                  <td className="estimate-sum-val">
+                    {discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="estimate-sum-label">Packing (0%)</td>
+                  <td className="estimate-sum-val">0.00</td>
+                </tr>
+                <tr className="estimate-sum-net-row">
+                  <td className="estimate-sum-label estimate-net-label">Net Amount</td>
+                  <td className="estimate-sum-val estimate-net-val">
+                    {netAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

@@ -355,7 +355,7 @@ export const Sales = ({
                 type="text"
                 className="form-control"
                 style={{ paddingLeft: '38px', height: '40px', fontSize: '0.875rem' }}
-                placeholder="Search by invoice no, customer name, mobile, cracker name..."
+                placeholder="Search by bill number, cracker name, code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -487,16 +487,10 @@ export const Sales = ({
                   #
                 </th>
                 <th style={{ textAlign: 'left', padding: '12px 14px', color: 'var(--text-heading)', fontWeight: 800 }}>
-                  Invoice No
+                  Bill Number
                 </th>
                 <th style={{ textAlign: 'left', padding: '12px 14px', color: 'var(--text-heading)', fontWeight: 800 }}>
-                  Date & Time
-                </th>
-                <th style={{ textAlign: 'left', padding: '12px 14px', color: 'var(--text-heading)', fontWeight: 800 }}>
-                  Customer Details
-                </th>
-                <th style={{ textAlign: 'left', padding: '12px 14px', color: 'var(--text-heading)', fontWeight: 800 }}>
-                  Items Summary
+                  Items
                 </th>
                 <th style={{ textAlign: 'center', padding: '12px 10px', color: 'var(--text-heading)', fontWeight: 800 }}>
                   Payment Mode
@@ -505,9 +499,9 @@ export const Sales = ({
                   Status
                 </th>
                 <th style={{ textAlign: 'right', padding: '12px 16px', color: 'var(--text-heading)', fontWeight: 800 }}>
-                  Total Amount (₹)
+                  Grand Total (₹)
                 </th>
-                <th style={{ textAlign: 'center', width: '110px', padding: '12px 10px', color: 'var(--text-heading)', fontWeight: 800 }}>
+                <th style={{ textAlign: 'center', width: '130px', padding: '12px 10px', color: 'var(--text-heading)', fontWeight: 800 }}>
                   Actions
                 </th>
               </tr>
@@ -516,7 +510,7 @@ export const Sales = ({
             <tbody>
               {filteredBills.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ padding: '60px 20px', textAlign: 'center' }}>
+                  <td colSpan={7} style={{ padding: '60px 20px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                       <div style={{
                         width: '56px',
@@ -583,7 +577,7 @@ export const Sales = ({
                         {index + 1}
                       </td>
 
-                      {/* 2. Invoice No */}
+                      {/* 2. Bill Number */}
                       <td style={{ padding: '12px 14px' }}>
                         <span 
                           style={{
@@ -605,28 +599,7 @@ export const Sales = ({
                         </span>
                       </td>
 
-                      {/* 3. Date & Time */}
-                      <td style={{ padding: '12px 14px' }}>
-                        <div style={{ fontWeight: 600, color: 'var(--text-heading)' }}>
-                          {bill.date}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Clock size={11} />
-                          <span>{bill.time || 'Counter POS'}</span>
-                        </div>
-                      </td>
-
-                      {/* 4. Customer Info */}
-                      <td style={{ padding: '12px 14px' }}>
-                        <div style={{ fontWeight: 700, color: 'var(--text-heading)' }}>
-                          {bill.customer?.name || 'Walk-in Customer'}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                          {bill.customer?.mobile ? `+91 ${bill.customer.mobile}` : 'Counter Sale'}
-                        </div>
-                      </td>
-
-                      {/* 5. Items Summary */}
+                      {/* 3. Items Summary */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span 
@@ -708,22 +681,33 @@ export const Sales = ({
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
-                            onClick={() => onViewInvoice?.(bill)}
+                            onClick={() => onViewInvoice?.(bill, 'standard')}
                             style={{ padding: '5px 8px', fontSize: '0.75rem' }}
-                            title="View & Print Bill"
+                            title="View Bill Details"
                           >
-                            <Eye size={14} color="#2563eb" />
+                            <Eye size={13} color="#2563eb" />
                             <span>View</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={() => onViewInvoice?.(bill, 'standard')}
+                            style={{ padding: '5px 8px', fontSize: '0.75rem' }}
+                            title="Print Original Invoice"
+                          >
+                            <Printer size={13} />
+                            <span>Print</span>
                           </button>
 
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
                             onClick={() => handleDelete(bill)}
-                            style={{ padding: '5px 8px', fontSize: '0.75rem', color: '#ef4444' }}
+                            style={{ padding: '5px 6px', fontSize: '0.75rem', color: '#ef4444' }}
                             title="Delete Sale (Restores Stock)"
                           >
-                            <Trash2 size={14} color="#ef4444" />
+                            <Trash2 size={13} color="#ef4444" />
                           </button>
                         </div>
                       </td>

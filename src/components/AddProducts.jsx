@@ -296,24 +296,13 @@ export const AddProducts = ({
 
                         {/* 2. Product Name */}
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80";
-                              }}
-                            />
-                            <div>
-                              <div className="item-name-cell" title={item.name}>
-                                {item.name}
-                              </div>
-                              <span className="item-code-badge">
-                                {item.code} • Max Stock: {maxStock}
-                              </span>
+                          <div>
+                            <div className="item-name-cell" title={item.name}>
+                              {item.name}
                             </div>
+                            <span className="item-code-badge">
+                              {item.code} • Max Stock: {maxStock}
+                            </span>
                           </div>
                         </td>
 

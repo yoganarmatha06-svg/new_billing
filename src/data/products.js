@@ -5,9 +5,9 @@ export const SHOP_DETAILS = {
   tagline: "Govt. Approved Licensed Wholesale & Retail Depot",
   licenseNo: "LIC/EXP-2024/SVKS-8942",
   gstin: "33AAACS5514F1ZP",
-  phone: "+91 98765 43210 / +91 94432 10987",
-  email: "support@sparkleboomcrackers.com",
-  address: "Shop No. 12-15, Sivakasi Bypass Road, Near Toll Plaza, Tamil Nadu - 626123",
+  phone: "9988765543",
+  email: "newbillng@gmail.com",
+  address: "Sivakasi, Tamil Nadu - 626123",
   website: "www.sparkleboomcrackers.com",
   terms: "1. Goods once sold will not be taken back. 2. Store in cool, dry place away from children. 3. Burst outdoors only under adult supervision."
 };
@@ -561,7 +561,7 @@ export const calculateItemTotals = (price, quantity, discountPercent = 0, gstPer
   };
 };
 
-export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0) => {
+export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0, gstConfig = null) => {
   let subtotal = 0; // Gross MRP total
   let totalItemDiscount = 0;
   let totalGst = 0;
@@ -584,6 +584,34 @@ export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0)
 
   // Additional manual / overall bill discount
   const manualDiscount = Number(overallDiscount) || 0;
+
+  // Custom GST typed by the cashier in Billing Summary
+  let effectiveGstRate = 18;
+  if (gstConfig !== null && gstConfig !== undefined) {
+    if (typeof gstConfig === 'object') {
+      const type = gstConfig.type || 'percent';
+      const rawVal = gstConfig.value;
+      if (rawVal === '' || rawVal === null || rawVal === undefined) {
+        totalGst = 0;
+        effectiveGstRate = 0;
+      } else {
+        const numVal = Math.max(0, parseFloat(rawVal) || 0);
+        if (type === 'percent') {
+          effectiveGstRate = numVal;
+          totalGst = (taxableTotal * numVal) / 100;
+        } else {
+          // Flat amount in ₹
+          totalGst = numVal;
+          effectiveGstRate = taxableTotal > 0 ? Number(((numVal / taxableTotal) * 100).toFixed(2)) : 0;
+        }
+      }
+    } else if (!isNaN(Number(gstConfig))) {
+      const numVal = Math.max(0, Number(gstConfig));
+      effectiveGstRate = numVal;
+      totalGst = (taxableTotal * numVal) / 100;
+    }
+  }
+
   const grandTotalRaw = Math.max(0, taxableTotal + totalGst - manualDiscount);
   const grandTotal = Math.round(grandTotalRaw);
   const roundOff = Number((grandTotal - grandTotalRaw).toFixed(2));
@@ -598,6 +626,7 @@ export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0)
     itemDiscount: Number(totalItemDiscount.toFixed(2)),
     manualDiscount,
     taxableAmount: Number(taxableTotal.toFixed(2)),
+    gstRate: effectiveGstRate,
     gstAmount: Number(totalGst.toFixed(2)),
     roundOff,
     grandTotal,

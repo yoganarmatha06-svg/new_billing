@@ -913,20 +913,21 @@
   flex-direction: row;
   align-items: flex-end;
   flex-wrap: nowrap !important;
-  gap: 10px;
+  gap: 8px;
   background: var(--bg-page);
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  padding: 10px 12px;
   box-shadow: var(--shadow-xs);
   width: 100%;
+  box-sizing: border-box;
   overflow: visible;
   position: relative;
 }
 
 .entry-field-code {
-  width: 95px;
-  flex: 0 0 95px;
+  width: 72px;
+  flex: 0 0 72px;
 }
 
 .entry-field-code input {
@@ -937,9 +938,10 @@
   border: 1.5px solid var(--border-dark);
   background: #ffffff;
   border-radius: var(--radius-sm);
-  padding: 0 8px;
+  padding: 0 6px;
   text-transform: uppercase;
   color: #2563eb;
+  text-align: center;
 }
 
 .entry-field-code input:focus {
@@ -949,14 +951,14 @@
 
 .entry-field-product {
   flex: 1 1 auto;
-  min-width: 140px;
+  min-width: 150px;
   position: relative;
   z-index: 50;
 }
 
 .entry-field-qty {
-  width: 90px;
-  flex: 0 0 90px;
+  width: 62px;
+  flex: 0 0 62px;
 }
 
 .entry-field-qty input {
@@ -972,8 +974,8 @@
 }
 
 .entry-field-rate {
-  width: 90px;
-  flex: 0 0 90px;
+  width: 76px;
+  flex: 0 0 76px;
 }
 
 .entry-field-rate input {
@@ -981,11 +983,11 @@
   text-align: right;
   font-weight: 700;
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   border: 1.5px solid var(--border-dark);
   background: #ffffff;
   border-radius: var(--radius-sm);
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 /* Hide stepper spin buttons on Rate input so numbers and placeholders never overlap */
@@ -1002,8 +1004,8 @@
 }
 
 .entry-field-amount {
-  width: 100px;
-  flex: 0 0 100px;
+  width: 84px;
+  flex: 0 0 84px;
 }
 
 .entry-field-amount input {
@@ -1011,12 +1013,12 @@
   text-align: right;
   font-weight: 800;
   font-family: var(--font-mono);
-  font-size: 0.925rem;
+  font-size: 0.85rem;
   border: 1.5px solid var(--border-light);
   background: var(--bg-page);
   color: #2563eb;
   border-radius: var(--radius-sm);
-  padding: 0 8px;
+  padding: 0 6px;
   cursor: default;
 }
 
@@ -1026,13 +1028,13 @@
 
 .entry-field-action button {
   height: 44px;
-  padding: 0 16px;
+  padding: 0 14px;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
 }
