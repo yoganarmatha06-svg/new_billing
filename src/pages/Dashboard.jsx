@@ -133,7 +133,8 @@ export const Dashboard = ({
             </button>
           </div>
 
-          <div className="table-responsive">
+          {/* Desktop Table View */}
+          <div className="desktop-table-view table-responsive">
             <table className="custom-table">
               <thead>
                 <tr>
@@ -193,6 +194,57 @@ export const Dashboard = ({
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card List View */}
+          <div className="mobile-cards-view">
+            {bills.slice(0, 5).map((bill) => (
+              <div key={bill.id} className="mobile-data-card">
+                <div className="mobile-data-card-header">
+                  <div>
+                    <span className="invoice-link-code" style={{ fontSize: '0.78rem' }}>
+                      #{bill.invoiceNo}
+                    </span>
+                    <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-heading)', marginTop: '3px' }}>
+                      {bill.customer?.name || 'Walk-in Customer'}
+                    </strong>
+                  </div>
+                  <span className={`badge ${
+                    bill.payment?.method === 'UPI' ? 'badge-blue' :
+                    bill.payment?.method === 'Card' ? 'badge-sky' : 'badge-success'
+                  }`}>
+                    {bill.payment?.method || 'Cash'}
+                  </span>
+                </div>
+
+                <div className="mobile-data-card-body">
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">Date & Time</span>
+                    <span className="mobile-data-value">{bill.date} • {bill.time}</span>
+                  </div>
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">Items Count</span>
+                    <span className="mobile-data-value">{bill.items?.length || 0} items</span>
+                  </div>
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">Grand Total</span>
+                    <span className="mobile-data-value highlight-amount">₹{bill.summary?.grandTotal || 0}</span>
+                  </div>
+                </div>
+
+                <div className="mobile-data-card-actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => onViewInvoice(bill)}
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
+                    <Eye size={14} />
+                    <span>View & Print Invoice</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

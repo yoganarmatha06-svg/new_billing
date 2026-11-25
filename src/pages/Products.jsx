@@ -137,12 +137,7 @@ export const Products = ({
         </div>
 
         <div className="billing-card-body">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1.5fr 1fr',
-            gap: '16px',
-            alignItems: 'center'
-          }}>
+          <div className="products-filter-bar">
             {/* Search */}
             <div style={{ position: 'relative' }}>
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--accent)' }} />
@@ -172,9 +167,10 @@ export const Products = ({
         </div>
       </div>
 
-      {/* Products Table */}
+      {/* Products Table & Mobile Cards */}
       <div className="transactions-card">
-        <div className="table-responsive">
+        {/* Desktop Table View */}
+        <div className="desktop-table-view table-responsive">
           <table className="custom-table">
             <thead>
               <tr>
@@ -246,6 +242,67 @@ export const Products = ({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards View */}
+        <div className="mobile-cards-view">
+          {filteredProducts.length === 0 ? (
+            <div style={{ padding: '30px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              No crackers found matching search.
+            </div>
+          ) : (
+            filteredProducts.map((p) => (
+              <div key={p.id} className="mobile-data-card">
+                <div className="mobile-data-card-header">
+                  <div>
+                    <h4 className="mobile-data-card-title">{p.name}</h4>
+                    <span className="mobile-data-card-subtitle" style={{ fontFamily: 'var(--font-mono)' }}>
+                      {p.code} • {p.unit || '1 Box'}
+                    </span>
+                  </div>
+                  <span className="badge badge-blue">{p.category}</span>
+                </div>
+
+                <div className="mobile-data-card-body">
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">MRP Rate</span>
+                    <span className="mobile-data-value highlight-amount">₹{p.price}</span>
+                  </div>
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">Stock Inventory</span>
+                    <span className={`badge ${p.stock < 30 ? 'badge-warning' : 'badge-success'}`}>
+                      {p.stock} Units
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mobile-data-card-actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => handleOpenEdit(p)}
+                  >
+                    <Edit2 size={13} color="var(--accent)" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                      if (window.confirm(`Delete "${p.name}"?`)) {
+                        onDeleteProduct(p.id);
+                        onShowToast?.(`Deleted ${p.name}`, 'warning');
+                      }
+                    }}
+                    style={{ flex: '0 0 44px' }}
+                    title={`Delete ${p.name}`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

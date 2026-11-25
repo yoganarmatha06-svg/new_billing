@@ -1,10 +1,12 @@
 import React from 'react';
-import { Calculator, Tag, Printer, FileText, Save, RotateCcw } from 'lucide-react';
+import { Calculator, FileText, Save, RotateCcw } from 'lucide-react';
 
 export const BillSummary = ({ 
   summary = {}, 
-  manualDiscount = 0, 
-  onManualDiscountChange,
+  discountType = 'percent',
+  onDiscountTypeChange,
+  customDiscountValue = '0',
+  onCustomDiscountChange,
   gstType = 'percent',
   onGstTypeChange,
   customGstValue = '18',
@@ -26,6 +28,12 @@ export const BillSummary = ({
     grandTotal = 0
   } = summary;
 
+  // Auto-detect discount mode: Double digit (1-2 digits) => %, 3 digits or more => ₹
+  const intDigits = String(customDiscountValue || '').trim().split('.')[0].replace(/\D/g, '');
+  const currentDiscountType = intDigits.length >= 3 
+    ? 'amount' 
+    : (intDigits.length > 0 ? 'percent' : (summary.discountType || discountType || 'percent'));
+
   return (
     <div className="billing-card">
       <div className="billing-card-header">
@@ -46,39 +54,71 @@ export const BillSummary = ({
             </span>
           </div>
 
-          {/* 2. Total Discount */}
-          <div className="summary-line-item discount-highlight">
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Tag size={13} color="var(--accent)" />
-              <span>Total Discount</span>
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-              - ₹{totalDiscount.toFixed(2)}
-            </span>
-          </div>
-
-          {/* Manual Extra Bill Discount if provided */}
-          {onManualDiscountChange && (
-            <div className="summary-line-item">
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Extra Bill Discount (₹)
+          {/* 2. Manual Typeable Discount (Auto: 1-2 digits = %, 3+ digits = ₹) */}
+          <div className="summary-line-item" style={{ alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.825rem', fontWeight: 600 }}>
+                Discount
               </span>
-              <div className="manual-discount-input-group">
+
+              {/* Mode Toggle: Highlights % for double digits, ₹ for 3+ digits */}
+              <div style={{ display: 'inline-flex', borderRadius: '4px', border: '1px solid var(--border-dark)', overflow: 'hidden' }}>
+                <button
+                  type="button"
+                  onClick={() => onDiscountTypeChange && onDiscountTypeChange('percent')}
+                  title="Double digit (1-99) = % Percentage"
+                  style={{
+                    padding: '2px 8px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    background: currentDiscountType === 'percent' ? '#2563eb' : '#f8fafc',
+                    color: currentDiscountType === 'percent' ? '#ffffff' : 'var(--text-secondary)',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  %
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDiscountTypeChange && onDiscountTypeChange('amount')}
+                  title="3 digits or more (100+) = ₹ Rupee"
+                  style={{
+                    padding: '2px 8px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    background: currentDiscountType === 'amount' ? '#2563eb' : '#f8fafc',
+                    color: currentDiscountType === 'amount' ? '#ffffff' : 'var(--text-secondary)',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ₹
+                </button>
+              </div>
+
+              {/* Typeable Discount Input Field */}
+              <div className="manual-discount-input-group" style={{ gap: '2px' }}>
                 <input
                   type="number"
                   min="0"
-                  max={Math.max(0, taxableAmount)}
+                  step="any"
                   className="manual-disc-input"
+                  style={{ width: '65px', textAlign: 'right', fontWeight: 700, fontFamily: 'var(--font-mono)' }}
                   placeholder="0"
-                  value={manualDiscount === 0 ? '' : manualDiscount}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    onManualDiscountChange(isNaN(val) ? 0 : Math.max(0, val));
-                  }}
+                  value={customDiscountValue}
+                  onChange={(e) => onCustomDiscountChange(e.target.value)}
                 />
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                  {currentDiscountType === 'percent' ? '%' : '₹'}
+                </span>
               </div>
             </div>
-          )}
+
+            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: totalDiscount > 0 ? '#16a34a' : 'var(--text-secondary)' }}>
+              - ₹{totalDiscount.toFixed(2)}
+            </span>
+          </div>
 
           {/* Taxable Amount */}
           <div className="summary-line-item">
@@ -186,7 +226,7 @@ export const BillSummary = ({
           {/* 5. Action Buttons (Generate Bill, Print Invoice, Save Draft, Clear All) */}
           {(onGenerateBill || onPrintInvoice) && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid var(--border-light)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '10px' }}>
+              <div className="billing-action-buttons-row">
                 {/* Save Bill Button */}
                 <button
                   type="button"
@@ -229,7 +269,7 @@ export const BillSummary = ({
                 </button>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div className="billing-action-subrow">
                 {/* Save Draft Button */}
                 {onSaveDraft && (
                   <button

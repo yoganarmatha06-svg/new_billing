@@ -197,9 +197,11 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
     : items.reduce((acc, it) => acc + (Number(it.price) || 0) * (Number(it.quantity) || 1), 0);
 
   const discountAmount = Number(summary.totalDiscount) || 0;
-  const discountPercent = subTotal > 0 && discountAmount > 0
-    ? Math.round((discountAmount / subTotal) * 100)
-    : 0;
+  const discountPercent = summary.discountRate !== undefined
+    ? Math.round(Number(summary.discountRate))
+    : (subTotal > 0 && discountAmount > 0
+        ? Math.round((discountAmount / subTotal) * 100)
+        : 0);
 
   const netAmount = summary.grandTotal !== undefined
     ? Number(summary.grandTotal)
@@ -207,157 +209,149 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
 
   return (
     <div className="estimate-bill-sheet print-area-wrapper">
-      <div className="estimate-box">
-        {/* Top Header Block */}
-        <div className="estimate-header-grid">
-          {/* Shop Name & Address (Left) */}
-          <div className="estimate-shop-info" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '68px', padding: '10px 14px' }}>
-            <h1 className="estimate-shop-name" style={{ fontSize: '22px', fontWeight: 900, letterSpacing: '1px', margin: 0, textTransform: 'uppercase' }}>
-              {SHOP_DETAILS.name || 'NEW BILLING'}
-            </h1>
-          </div>
+      <table className="estimate-main-table">
+        <colgroup>
+          <col style={{ width: '6%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '48%' }} />
+          <col style={{ width: '6%' }} />
+          <col style={{ width: '16%' }} />
+          <col style={{ width: '16%' }} />
+        </colgroup>
 
-          {/* Contact Details (Right) */}
-          <div className="estimate-contact-info">
-            <div className="estimate-contact-row">
-              <Phone size={13} className="estimate-icon" />
-              <div>
-                <div>{SHOP_DETAILS.phone || '9988765543'}</div>
+        <tbody>
+          {/* Row 1: Header (Shop Name on left, Phone/Email on right) */}
+          <tr className="row-header">
+            <td colSpan={4} className="cell-shop-info">
+              <h1 className="estimate-shop-name">
+                {SHOP_DETAILS.name || 'NEW BILLING'}
+              </h1>
+            </td>
+            <td colSpan={2} className="cell-contact-info">
+              <div className="contact-line">
+                <Phone size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <span>{SHOP_DETAILS.phone || '9988765543'}</span>
               </div>
-            </div>
-
-            <div className="estimate-contact-row" style={{ marginTop: '8px' }}>
-              <Mail size={13} className="estimate-icon" />
-              <div style={{ wordBreak: 'break-all' }}>{SHOP_DETAILS.email || 'newbillng@gmail.com'}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Estimate Title Bar */}
-        <div className="estimate-title-bar">
-          <span>Estimate</span>
-        </div>
-
-        {/* Customer & Estimate Meta Row */}
-        <div className="estimate-meta-grid">
-          {/* Customer Details (Left) */}
-          <div className="estimate-customer-box">
-            <div className="estimate-customer-to-row">
-              <span className="estimate-to-badge">To</span>
-              <span className="estimate-customer-name">
-                {customerName}
-              </span>
-            </div>
-            {customerAddress && (
-              <div className="estimate-customer-sub">
-                {customerAddress}
+              <div className="contact-line" style={{ marginTop: '5px' }}>
+                <Mail size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <span>{SHOP_DETAILS.email || 'newbillng@gmail.com'}</span>
               </div>
-            )}
-            {customerPhone && (
-              <div className="estimate-customer-sub estimate-customer-phone">
-                {customerPhone}
+            </td>
+          </tr>
+
+          {/* Row 2: Estimate Title Bar */}
+          <tr className="row-estimate-title">
+            <td colSpan={6} className="cell-estimate-title">
+              <span>Estimate</span>
+            </td>
+          </tr>
+
+          {/* Row 3: Customer & Meta Details */}
+          <tr className="row-customer-meta">
+            <td colSpan={4} className="cell-customer">
+              <div className="customer-to-line">
+                <span className="estimate-to-badge">To</span>
+                <strong className="customer-name">{customerName}</strong>
               </div>
-            )}
-          </div>
+              {customerAddress && (
+                <div className="customer-sub">{customerAddress}</div>
+              )}
+              {customerPhone && (
+                <div className="customer-sub customer-phone">{customerPhone}</div>
+              )}
+            </td>
+            <td colSpan={2} className="cell-meta">
+              <div className="meta-line">
+                <strong>Estimate No: </strong>
+                <span>{estimateNo}</span>
+              </div>
+              <div className="meta-line" style={{ marginTop: '4px' }}>
+                <strong>Date : </strong>
+                <span>{formattedDate}</span>
+              </div>
+            </td>
+          </tr>
 
-          {/* Estimate No & Date (Right) */}
-          <div className="estimate-no-date-box">
-            <div className="estimate-meta-row">
-              <span className="estimate-meta-label">Estimate No:</span>
-              <span className="estimate-meta-val">{estimateNo}</span>
-            </div>
-            <div className="estimate-meta-row">
-              <span className="estimate-meta-label">Date :</span>
-              <span className="estimate-meta-val">{formattedDate}</span>
-            </div>
-          </div>
-        </div>
+          {/* Row 4: Products Table Header */}
+          <tr className="row-table-headers">
+            <th style={{ textAlign: 'center' }}>S.No.</th>
+            <th style={{ textAlign: 'center' }}>Code</th>
+            <th style={{ textAlign: 'center' }}>Product</th>
+            <th style={{ textAlign: 'center' }}>Qty</th>
+            <th style={{ textAlign: 'center' }}>Rate (Rs.) / Content</th>
+            <th style={{ textAlign: 'center' }}>Total ₹</th>
+          </tr>
 
-        {/* Product Table */}
-        <div className="estimate-table-wrapper">
-          <table className="estimate-table">
-            <thead>
-              <tr>
-                <th style={{ width: '6%', textAlign: 'center' }}>S.No.</th>
-                <th style={{ width: '8%', textAlign: 'center' }}>Code</th>
-                <th style={{ width: '48%', textAlign: 'center' }}>Product</th>
-                <th style={{ width: '6%', textAlign: 'center' }}>Qty</th>
-                <th style={{ width: '16%', textAlign: 'center' }}>Rate (Rs.) / Content</th>
-                <th style={{ width: '16%', textAlign: 'center' }}>Total ₹</th>
+          {/* Item Rows */}
+          {items.map((item, idx) => {
+            const qty = Number(item.quantity) || 1;
+            const price = Number(item.price) || 0;
+            const disc = Number(item.discount) || 0;
+            const gross = price * qty;
+            const itemTotal = gross - (gross * (disc / 100));
+            const code = item.code ? (item.code.replace(/^[^\d]*-?/, '') || item.code) : String(idx + 1);
+            const unit = item.unit ? item.unit.replace(/^1\s*/i, '') : 'Box';
+
+            return (
+              <tr key={idx} className="row-item">
+                <td style={{ textAlign: 'center' }}>{idx + 1}</td>
+                <td style={{ textAlign: 'center', fontWeight: 800 }}>{code}</td>
+                <td style={{ textAlign: 'left', paddingLeft: '8px' }}>{item.name}</td>
+                <td style={{ textAlign: 'center', fontWeight: 800 }}>{qty}</td>
+                <td style={{ textAlign: 'center', fontWeight: 700 }}>
+                  {price} / {unit}
+                </td>
+                <td style={{ textAlign: 'right', paddingRight: '8px', fontWeight: 700 }}>
+                  {itemTotal.toFixed(2)}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {items.map((item, idx) => {
-                const qty = Number(item.quantity) || 1;
-                const price = Number(item.price) || 0;
-                const disc = Number(item.discount) || 0;
-                const gross = price * qty;
-                const itemTotal = gross - (gross * (disc / 100));
-                const code = item.code ? (item.code.replace(/^[^\d]*-?/, '') || item.code) : String(idx + 1);
-                const unit = item.unit ? item.unit.replace(/^1\s*/i, '') : 'Box';
+            );
+          })}
 
-                return (
-                  <tr key={idx} className="estimate-item-row">
-                    <td style={{ textAlign: 'center' }}>{idx + 1}</td>
-                    <td style={{ textAlign: 'center', fontWeight: 800 }}>{code}</td>
-                    <td style={{ textAlign: 'left', paddingLeft: '8px' }}>{item.name}</td>
-                    <td style={{ textAlign: 'center', fontWeight: 800 }}>{qty}</td>
-                    <td style={{ textAlign: 'center', fontWeight: 700 }}>
-                      {price} / {unit}
-                    </td>
-                    <td style={{ textAlign: 'right', paddingRight: '10px', fontWeight: 700 }}>
-                      {itemTotal.toFixed(2)}
-                    </td>
-                  </tr>
-                );
-              })}
+          {/* Filler Row: Continues all vertical borders down to the summary box */}
+          <tr className="row-filler">
+            <td style={{ textAlign: 'center' }}>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
 
-              {/* Stretch vertical border lines downwards like the original estimate sheet */}
-              <tr className="estimate-filler-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          {/* Summary Row 1: Sub Total */}
+          <tr className="row-summary">
+            <td colSpan={4} rowSpan={4} className="cell-summary-empty">
+              &nbsp;
+            </td>
+            <td className="cell-sum-label">Sub Total</td>
+            <td className="cell-sum-val">
+              {subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
 
-        {/* Summary Block at Bottom Right */}
-        <div className="estimate-summary-container">
-          <div className="estimate-summary-blank-space"></div>
-          <div className="estimate-summary-table-box">
-            <table className="estimate-summary-table">
-              <tbody>
-                <tr>
-                  <td className="estimate-sum-label">Sub Total</td>
-                  <td className="estimate-sum-val">
-                    {subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="estimate-sum-label">Discount ({discountPercent}%)</td>
-                  <td className="estimate-sum-val">
-                    {discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="estimate-sum-label">Packing (0%)</td>
-                  <td className="estimate-sum-val">0.00</td>
-                </tr>
-                <tr className="estimate-sum-net-row">
-                  <td className="estimate-sum-label estimate-net-label">Net Amount</td>
-                  <td className="estimate-sum-val estimate-net-val">
-                    {netAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+          {/* Summary Row 2: Discount */}
+          <tr className="row-summary">
+            <td className="cell-sum-label">Discount ({discountPercent}%)</td>
+            <td className="cell-sum-val">
+              {discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
+
+          {/* Summary Row 3: Packing */}
+          <tr className="row-summary">
+            <td className="cell-sum-label">Packing (0%)</td>
+            <td className="cell-sum-val">0.00</td>
+          </tr>
+
+          {/* Summary Row 4: Net Amount */}
+          <tr className="row-summary row-net-amount">
+            <td className="cell-sum-label net-label">Net Amount</td>
+            <td className="cell-sum-val net-val">
+              {netAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };

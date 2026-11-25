@@ -94,9 +94,10 @@ export const Customers = ({
         </div>
       </div>
 
-      {/* Customers Table */}
+      {/* Customers Table & Mobile Cards */}
       <div className="transactions-card">
-        <div className="table-responsive">
+        {/* Desktop Table View */}
+        <div className="desktop-table-view table-responsive">
           <table className="custom-table">
             <thead>
               <tr>
@@ -172,6 +173,78 @@ export const Customers = ({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards View */}
+        <div className="mobile-cards-view">
+          {filteredCustomers.length === 0 ? (
+            <div style={{ padding: '30px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              No customers found matching search.
+            </div>
+          ) : (
+            filteredCustomers.map((cust) => (
+              <div key={cust.id} className="mobile-data-card">
+                <div className="mobile-data-card-header">
+                  <div>
+                    <h4 className="mobile-data-card-title">{cust.name}</h4>
+                    <span className="mobile-data-card-subtitle">
+                      Last visit: {cust.lastPurchase || 'Recent'}
+                    </span>
+                  </div>
+                  <span className="badge badge-sky">{cust.billsCount || 0} Bills</span>
+                </div>
+
+                <div className="mobile-data-card-body">
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">
+                      <Phone size={13} color="#2563eb" /> Phone
+                    </span>
+                    <span className="mobile-data-value" style={{ fontFamily: 'var(--font-mono)' }}>
+                      +91 {cust.mobile}
+                    </span>
+                  </div>
+                  {cust.address && (
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">
+                        <MapPin size={13} color="#2563eb" /> Address
+                      </span>
+                      <span className="mobile-data-value">{cust.address}</span>
+                    </div>
+                  )}
+                  <div className="mobile-data-row">
+                    <span className="mobile-data-label">Total Purchases</span>
+                    <span className="mobile-data-value highlight-amount">
+                      ₹{(cust.totalPurchases || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mobile-data-card-actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => onSelectCustomerForBill(cust)}
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    <ReceiptText size={14} />
+                    <span>Create Bill</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                      onDeleteCustomer?.(cust.id);
+                      onShowToast?.(`Customer "${cust.name}" deleted`, 'warning');
+                    }}
+                    style={{ flex: '0 0 44px', justifyContent: 'center' }}
+                    title={`Delete ${cust.name}`}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

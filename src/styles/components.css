@@ -1,7 +1,7 @@
 /* components.css - Light Blue & White Theme */
 
 /* ==========================================================================
-   Sidebar Styles
+   Sidebar Styles - Fixed Left Navigation
    ========================================================================== */
 .app-sidebar {
   width: 260px;
@@ -10,21 +10,19 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.28s ease;
-  z-index: 100;
-  position: sticky;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+  z-index: 1000;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
   height: 100vh;
+  height: 100dvh;
+  box-shadow: 1px 0 3px rgba(15, 23, 42, 0.04);
 }
 
 .app-sidebar.collapsed {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  border-right: none !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  transform: translateX(-100%);
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -496,7 +494,7 @@
 }
 
 /* ==========================================================================
-   Estimate Bill Layout (New Billing Format)
+   Estimate Bill Layout (Unified Table for 100% Continuous Lines)
    ========================================================================== */
 .estimate-bill-sheet {
   background: #ffffff;
@@ -509,113 +507,78 @@
   box-sizing: border-box;
 }
 
-.estimate-box {
-  border: 1.5px solid #000000;
-  background: #ffffff;
+.estimate-main-table {
   width: 100%;
-  box-sizing: border-box;
+  border-collapse: collapse !important;
+  border: 1.5px solid #000000 !important;
+  table-layout: fixed;
+  background: #ffffff;
+  color: #000000;
 }
 
-/* Header */
-.estimate-header-grid {
-  display: flex;
-  border-bottom: 1.5px solid #000000;
+.estimate-main-table td,
+.estimate-main-table th {
+  border: 1.5px solid #000000 !important;
+  padding: 4px 6px;
+  font-size: 11.5px;
+  color: #000000;
+  box-sizing: border-box;
   background: #ffffff;
 }
 
-.estimate-shop-info {
-  flex: 1;
-  padding: 8px 12px;
+/* Header Row 1 */
+.cell-shop-info {
   text-align: center;
+  vertical-align: middle;
+  padding: 12px 14px !important;
 }
 
 .estimate-shop-name {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   margin: 0;
-  text-transform: uppercase;
-  color: #000000;
   line-height: 1.2;
 }
 
-.estimate-shop-trader {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  margin: 2px 0 0 0;
-  text-transform: uppercase;
-  color: #000000;
-  line-height: 1.2;
-}
-
-.estimate-shop-addr {
-  font-size: 10.5px;
-  font-weight: 700;
-  margin-top: 2px;
-  text-transform: uppercase;
-  color: #000000;
-  line-height: 1.25;
-}
-
-.estimate-contact-info {
-  width: 290px;
-  border-left: 1.5px solid #000000;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  font-size: 10.5px;
+.cell-contact-info {
+  vertical-align: middle;
+  padding: 8px 12px !important;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.35;
-  color: #000000;
-  background: #ffffff;
 }
 
-.estimate-contact-row {
+.contact-line {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
-.estimate-icon {
-  margin-top: 2px;
-  flex-shrink: 0;
-  color: #000000;
-}
-
-/* Estimate Title Bar */
-.estimate-title-bar {
-  border-bottom: 1.5px solid #000000;
+/* Row 2: Estimate Title */
+.cell-estimate-title {
   text-align: center;
-  padding: 3px 0;
+  padding: 3px 0 !important;
   background: #ffffff;
 }
 
-.estimate-title-bar span {
-  font-size: 14px;
+.cell-estimate-title span {
+  font-size: 14.5px;
   font-weight: 900;
   text-decoration: underline;
   letter-spacing: 0.5px;
-  color: #000000;
 }
 
-/* Customer & Estimate Meta */
-.estimate-meta-grid {
-  display: flex;
-  border-bottom: 1.5px solid #000000;
-  min-height: 48px;
-  background: #ffffff;
-}
-
-.estimate-customer-box {
-  flex: 1;
-  padding: 6px 12px;
+/* Row 3: Customer & Meta */
+.cell-customer {
+  padding: 6px 12px !important;
+  vertical-align: top;
   font-size: 11.5px;
   line-height: 1.35;
 }
 
-.estimate-customer-to-row {
+.customer-to-line {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -630,156 +593,92 @@
   line-height: 1.3;
 }
 
-.estimate-customer-name {
-  font-size: 12.5px;
+.customer-name {
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
-  color: #000000;
 }
 
-.estimate-customer-sub {
-  margin-top: 1px;
+.customer-sub {
+  margin-top: 2px;
+  padding-left: 28px;
   font-weight: 600;
   font-size: 11px;
-  color: #111111;
-  padding-left: 28px;
 }
 
-.estimate-customer-phone {
+.customer-phone {
   font-weight: 800;
-  color: #000000;
 }
 
-.estimate-no-date-box {
-  width: 290px;
-  border-left: 1.5px solid #000000;
-  padding: 6px 12px;
+.cell-meta {
+  padding: 6px 12px !important;
+  vertical-align: middle;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.meta-line {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 11.5px;
-  background: #ffffff;
 }
 
-.estimate-meta-row {
-  display: flex;
-  gap: 8px;
-  font-size: 11.5px;
-  color: #000000;
-}
-
-.estimate-meta-label {
+.meta-line strong {
   font-weight: 800;
 }
 
-.estimate-meta-val {
-  font-weight: 700;
-}
-
-/* Product Table */
-.estimate-table-wrapper {
-  width: 100%;
-  background: #ffffff;
-  border-bottom: 1.5px solid #000000;
-}
-
-.estimate-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background: #ffffff;
-}
-
-.estimate-table th {
-  border-bottom: 1.5px solid #000000;
-  border-right: 1.5px solid #000000;
-  padding: 4px 2px;
+/* Row 4: Table Headers */
+.row-table-headers th {
+  padding: 5px 2px !important;
   font-size: 11.5px;
   font-weight: 800;
-  color: #000000;
+  text-align: center;
   background: #ffffff;
 }
 
-.estimate-table th:last-child {
-  border-right: none;
-}
-
-.estimate-table td {
-  border-right: 1.5px solid #000000;
-  padding: 3px 6px;
-  font-size: 11.5px;
-  color: #000000;
+/* Items Rows */
+.row-item td {
+  padding: 3px 6px !important;
+  height: 24px;
   vertical-align: middle;
 }
 
-.estimate-table td:last-child {
-  border-right: none;
+/* Filler Row for continuous lines */
+.row-filler td {
+  height: 380px !important;
+  padding: 0 !important;
+  vertical-align: top;
+  line-height: 1;
 }
 
-.estimate-item-row td {
-  height: 24px;
-}
-
-.estimate-filler-row td {
-  height: 360px;
-  padding: 0;
-}
-
-/* Summary Box */
-.estimate-summary-container {
-  display: flex;
-  width: 100%;
+/* Summary Rows */
+.cell-summary-empty {
+  border-top: 1.5px solid #000000 !important;
+  border-bottom: 1.5px solid #000000 !important;
+  border-left: 1.5px solid #000000 !important;
   background: #ffffff;
 }
 
-.estimate-summary-blank-space {
-  width: 68%;
-}
-
-.estimate-summary-table-box {
-  width: 32%;
-  border-left: 1.5px solid #000000;
-}
-
-.estimate-summary-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.estimate-summary-table tr {
-  border-bottom: 1.5px solid #000000;
-}
-
-.estimate-summary-table tr:last-child {
-  border-bottom: none;
-}
-
-.estimate-sum-label {
-  width: 50%;
-  padding: 4px 6px;
-  font-size: 11.5px;
-  font-weight: 700;
+.cell-sum-label {
   text-align: center;
-  border-right: 1.5px solid #000000;
-  color: #000000;
-}
-
-.estimate-sum-val {
-  width: 50%;
-  padding: 4px 8px;
-  font-size: 11.5px;
   font-weight: 700;
-  text-align: right;
-  color: #000000;
+  font-size: 11.5px;
+  padding: 4px 6px !important;
 }
 
-.estimate-net-label {
+.cell-sum-val {
+  text-align: right;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 4px 8px !important;
+}
+
+.net-label {
   font-weight: 900;
   font-size: 12.5px;
 }
 
-.estimate-net-val {
+.net-val {
   font-weight: 900;
   font-size: 14px;
 }
@@ -1112,23 +1011,67 @@
   );
 }
 
-/* Responsiveness */
+/* Sidebar Desktop Close vs Mobile Close */
+.sidebar-mobile-close {
+  display: none;
+}
+.sidebar-desktop-close {
+  display: inline-block;
+}
+
+/* Responsiveness - Mobile Drawer & Hamburger Navigation */
 @media (max-width: 900px) {
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    z-index: 1400;
+    animation: fadeIn 0.2s ease-out;
+  }
+
   .app-sidebar {
-    width: 220px;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    max-width: 85vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: 1500 !important;
+    transform: translateX(0);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3) !important;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    border-right: 1px solid var(--border-light) !important;
+  }
+
+  .app-sidebar.collapsed {
+    transform: translateX(-100%) !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 85vw !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .sidebar-desktop-close {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close {
+    display: inline-block !important;
   }
 }
 
 @media (max-width: 768px) {
-  .app-sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-  }
   .app-navbar {
-    padding: 0 16px;
+    padding: 0 14px;
+    height: 56px;
   }
   .tax-invoice-sheet {
     padding: 20px 16px;
@@ -1146,5 +1089,98 @@
   }
   .banner-main-title {
     font-size: 1.75rem;
+  }
+}
+
+/* ==========================================================================
+   Responsive Grid & Toolbar Utilities
+   ========================================================================== */
+.products-filter-bar {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .products-filter-bar {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.sales-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .sales-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sales-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+  .sales-kpi-grid .billing-card {
+    padding: 12px 10px !important;
+  }
+}
+
+.reports-main-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .reports-main-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .invoice-modal-header {
+    padding: 14px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .invoice-modal-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .format-switcher {
+    width: 100%;
+  }
+
+  .format-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .invoice-preview-modal-content {
+    max-height: 96vh;
+  }
+
+  .invoice-modal-body {
+    padding: 12px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
+
+  .estimate-bill-sheet {
+    min-width: 580px;
   }
 }

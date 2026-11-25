@@ -457,7 +457,7 @@ export const BillingTable = ({
 
                       {/* 5. Total */}
                       <td style={{ textAlign: 'right', padding: '10px 10px', fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--text-heading)' }}>
-                        ₹{calcs.total}
+                        ₹{(price * qty).toFixed(2)}
                       </td>
 
                       {/* 6. Remove button */}

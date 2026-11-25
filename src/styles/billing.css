@@ -720,6 +720,29 @@
 /* ==========================================================================
    Reduced Size Compact Customer Information Strip
    ========================================================================== */
+.billing-action-buttons-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 10px;
+}
+
+.billing-action-subrow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 540px) {
+  .billing-action-buttons-row {
+    grid-template-columns: 1fr;
+  }
+  .billing-action-buttons-row .btn,
+  .billing-action-subrow .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
 .customer-compact-card {
   background: #ffffff;
   border: 1.5px solid var(--border-light);
@@ -1074,6 +1097,79 @@
 
   .entry-field-action {
     flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-entry-bar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    align-items: flex-end !important;
+  }
+
+  .entry-field-code {
+    flex: 0 0 75px !important;
+    width: 75px !important;
+  }
+
+  .entry-field-product {
+    flex: 1 1 calc(100% - 85px) !important;
+    min-width: 0 !important;
+  }
+
+  .entry-field-qty {
+    flex: 1 1 calc(33.333% - 6px) !important;
+    width: auto !important;
+    min-width: 55px !important;
+  }
+
+  .entry-field-rate {
+    flex: 1 1 calc(33.333% - 6px) !important;
+    width: auto !important;
+    min-width: 65px !important;
+  }
+
+  .entry-field-amount {
+    flex: 1 1 calc(33.333% - 6px) !important;
+    width: auto !important;
+    min-width: 65px !important;
+  }
+
+  .entry-field-action {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+  }
+
+  .entry-field-action button {
+    width: 100% !important;
+    height: 44px !important;
+    justify-content: center !important;
+    font-size: 0.95rem !important;
+  }
+
+  .product-autocomplete-dropdown {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 32px) !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  .cart-table th, 
+  .cart-table td {
+    padding: 8px 6px !important;
+    font-size: 0.775rem !important;
+  }
+
+  .unified-billing-header {
+    padding: 10px 14px;
+  }
+
+  .customer-compact-card {
+    padding: 8px 10px;
   }
 }
 

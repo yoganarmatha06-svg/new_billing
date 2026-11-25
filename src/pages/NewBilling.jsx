@@ -43,8 +43,20 @@ export const NewBilling = ({
   // 3. Cart Items State (Selected Products)
   const [cartItems, setCartItems] = useState([]);
 
-  // 4. Manual Overall Bill Discount
-  const [manualDiscount, setManualDiscount] = useState(0);
+  // 4. Manual Overall Bill Discount Configuration (Typeable in Billing Summary)
+  const [discountType, setDiscountType] = useState('percent'); // 'percent' | 'amount'
+  const [customDiscountValue, setCustomDiscountValue] = useState('0');
+
+  // Handle discount change with automatic double digit (%) vs 3 digits (₹) detection
+  const handleDiscountChange = (val) => {
+    setCustomDiscountValue(val);
+    const clean = String(val).trim().split('.')[0].replace(/\D/g, '');
+    if (clean.length >= 3) {
+      setDiscountType('amount');
+    } else {
+      setDiscountType('percent');
+    }
+  };
 
   // 5. Custom GST Configuration (Typeable in Billing Summary)
   const [gstType, setGstType] = useState('percent'); // 'percent' | 'amount'
@@ -71,8 +83,10 @@ export const NewBilling = ({
             setSavedCustomerInfo({ ...parsed.customer, id: parsed.customerId || `CUST-${Date.now().toString().slice(-6)}` });
           }
         }
-        if (Array.isArray(parsed.cartItems) && parsed.cartItems.length > 0) setCartItems(parsed.cartItems);
-        if (parsed.manualDiscount) setManualDiscount(parsed.manualDiscount);
+        if (parsed.cartItems) setCartItems(parsed.cartItems);
+        if (parsed.discountType) setDiscountType(parsed.discountType);
+        if (parsed.customDiscountValue !== undefined) setCustomDiscountValue(parsed.customDiscountValue);
+        else if (parsed.manualDiscount) setCustomDiscountValue(String(parsed.manualDiscount));
         if (parsed.paymentMethod) setPaymentMethod(parsed.paymentMethod);
         if (parsed.amountPaid) setAmountPaid(parsed.amountPaid);
       }
@@ -163,11 +177,14 @@ export const NewBilling = ({
 
   // Compute live billing summary
   const summary = useMemo(() => {
-    return calculateBillSummary(cartItems, manualDiscount, amountPaid, {
+    return calculateBillSummary(cartItems, {
+      type: discountType,
+      value: customDiscountValue
+    }, amountPaid, {
       type: gstType,
       value: customGstValue
     });
-  }, [cartItems, manualDiscount, amountPaid, gstType, customGstValue]);
+  }, [cartItems, discountType, customDiscountValue, amountPaid, gstType, customGstValue]);
 
   // Sync default amount paid with grand total when grand total changes
   useEffect(() => {
@@ -230,7 +247,7 @@ export const NewBilling = ({
           category: product.category,
           price: finalPrice,
           quantity: Math.min(addQty, maxStock),
-          discount: product.discount || 0,
+          discount: 0,
           gst: product.gst || 18,
           unit: product.unit || '1 Box',
           image: product.image,
@@ -277,7 +294,8 @@ export const NewBilling = ({
     if (cartItems.length === 0) return;
     if (window.confirm('Clear all products from the billing table?')) {
       setCartItems([]);
-      setManualDiscount(0);
+      setDiscountType('percent');
+      setCustomDiscountValue('0');
       setAmountPaid(0);
       onShowToast?.('Billing table cleared', 'info');
     }
@@ -337,6 +355,8 @@ export const NewBilling = ({
         itemsCount: summary.itemsCount,
         subtotal: summary.subtotal,
         totalDiscount: summary.totalDiscount,
+        discountRate: summary.discountRate,
+        discountType: summary.discountType,
         taxableAmount: summary.taxableAmount,
         gstRate: summary.gstRate,
         gstAmount: summary.gstAmount,
@@ -360,7 +380,8 @@ export const NewBilling = ({
         customer,
         customerId: savedCustomerInfo?.id,
         cartItems,
-        manualDiscount,
+        discountType,
+        customDiscountValue,
         paymentMethod,
         amountPaid,
         updatedAt: new Date().toISOString()
@@ -428,7 +449,8 @@ export const NewBilling = ({
       setIsCustomerSaved(false);
       setSavedCustomerInfo(null);
       setCartItems([]);
-      setManualDiscount(0);
+      setDiscountType('percent');
+      setCustomDiscountValue('0');
       setCustomGstValue('18');
       setGstType('percent');
       setAmountPaid(0);
@@ -484,7 +506,8 @@ export const NewBilling = ({
       setIsCustomerSaved(false);
       setSavedCustomerInfo(null);
       setCartItems([]);
-      setManualDiscount(0);
+      setDiscountType('percent');
+      setCustomDiscountValue('0');
       setAmountPaid(0);
       setPaymentMethod('Cash');
       setPaymentStatus('Paid');
@@ -549,8 +572,10 @@ export const NewBilling = ({
           <div className="unified-summary-column">
             <BillSummary
               summary={summary}
-              manualDiscount={manualDiscount}
-              onManualDiscountChange={setManualDiscount}
+              discountType={discountType}
+              onDiscountTypeChange={setDiscountType}
+              customDiscountValue={customDiscountValue}
+              onCustomDiscountChange={handleDiscountChange}
               gstType={gstType}
               onGstTypeChange={setGstType}
               customGstValue={customGstValue}

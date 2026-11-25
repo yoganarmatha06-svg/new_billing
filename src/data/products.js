@@ -561,7 +561,7 @@ export const calculateItemTotals = (price, quantity, discountPercent = 0, gstPer
   };
 };
 
-export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0, gstConfig = null) => {
+export const calculateBillSummary = (items, discountConfig = 0, amountPaid = 0, gstConfig = null) => {
   let subtotal = 0; // Gross MRP total
   let totalItemDiscount = 0;
   let totalGst = 0;
@@ -582,8 +582,48 @@ export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0,
     totalItemsCount += qty;
   });
 
-  // Additional manual / overall bill discount
-  const manualDiscount = Number(overallDiscount) || 0;
+  // Calculate manual bill discount:
+  // Double digit (1-2 digits, e.g. 1-99) => percentage (%)
+  // 3 digits or more (e.g. 100, 250, 1000) => rupees (₹)
+  let manualDiscount = 0;
+  let effectiveDiscountRate = 0;
+  let effectiveType = 'percent';
+
+  if (discountConfig !== null && discountConfig !== undefined) {
+    const rawVal = typeof discountConfig === 'object' ? discountConfig.value : discountConfig;
+    const specifiedType = typeof discountConfig === 'object' ? discountConfig.type : null;
+
+    if (rawVal === '' || rawVal === null || rawVal === undefined) {
+      manualDiscount = 0;
+      effectiveDiscountRate = 0;
+      effectiveType = specifiedType || 'percent';
+    } else {
+      const numVal = Math.max(0, parseFloat(rawVal) || 0);
+      const intDigits = String(rawVal).trim().split('.')[0].replace(/\D/g, '');
+
+      // Auto detect: 1-2 digits => %, 3+ digits => ₹
+      if (intDigits.length >= 3) {
+        effectiveType = 'amount';
+      } else if (intDigits.length > 0) {
+        effectiveType = 'percent';
+      } else {
+        effectiveType = specifiedType || 'percent';
+      }
+
+      if (effectiveType === 'percent') {
+        effectiveDiscountRate = numVal;
+        manualDiscount = (subtotal * numVal) / 100;
+      } else {
+        // Flat amount in ₹
+        manualDiscount = Math.min(subtotal, numVal);
+        effectiveDiscountRate = subtotal > 0 ? Number(((manualDiscount / subtotal) * 100).toFixed(2)) : 0;
+      }
+    }
+  }
+
+  // Combined discount: item-level discounts (if any) + manual overall discount
+  const totalDiscount = Number((totalItemDiscount + manualDiscount).toFixed(2));
+  const effectiveTaxable = Math.max(0, subtotal - totalDiscount);
 
   // Custom GST typed by the cashier in Billing Summary
   let effectiveGstRate = 18;
@@ -598,21 +638,21 @@ export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0,
         const numVal = Math.max(0, parseFloat(rawVal) || 0);
         if (type === 'percent') {
           effectiveGstRate = numVal;
-          totalGst = (taxableTotal * numVal) / 100;
+          totalGst = (effectiveTaxable * numVal) / 100;
         } else {
           // Flat amount in ₹
           totalGst = numVal;
-          effectiveGstRate = taxableTotal > 0 ? Number(((numVal / taxableTotal) * 100).toFixed(2)) : 0;
+          effectiveGstRate = effectiveTaxable > 0 ? Number(((numVal / effectiveTaxable) * 100).toFixed(2)) : 0;
         }
       }
     } else if (!isNaN(Number(gstConfig))) {
       const numVal = Math.max(0, Number(gstConfig));
       effectiveGstRate = numVal;
-      totalGst = (taxableTotal * numVal) / 100;
+      totalGst = (effectiveTaxable * numVal) / 100;
     }
   }
 
-  const grandTotalRaw = Math.max(0, taxableTotal + totalGst - manualDiscount);
+  const grandTotalRaw = Math.max(0, effectiveTaxable + totalGst);
   const grandTotal = Math.round(grandTotalRaw);
   const roundOff = Number((grandTotal - grandTotalRaw).toFixed(2));
   
@@ -622,10 +662,12 @@ export const calculateBillSummary = (items, overallDiscount = 0, amountPaid = 0,
   return {
     itemsCount: totalItemsCount,
     subtotal: Number(subtotal.toFixed(2)),
-    totalDiscount: Number((totalItemDiscount + manualDiscount).toFixed(2)),
+    totalDiscount,
+    discountRate: effectiveDiscountRate,
+    discountType: effectiveType,
     itemDiscount: Number(totalItemDiscount.toFixed(2)),
-    manualDiscount,
-    taxableAmount: Number(taxableTotal.toFixed(2)),
+    manualDiscount: Number(manualDiscount.toFixed(2)),
+    taxableAmount: Number(effectiveTaxable.toFixed(2)),
     gstRate: effectiveGstRate,
     gstAmount: Number(totalGst.toFixed(2)),
     roundOff,

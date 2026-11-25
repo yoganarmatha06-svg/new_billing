@@ -7,8 +7,8 @@ import {
   Users, 
   BarChart3, 
   Settings,
-  CircleDot,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 
 export const Sidebar = ({ activePage, onNavigate, isOpen = true, onToggle }) => {
@@ -72,7 +72,8 @@ export const Sidebar = ({ activePage, onNavigate, isOpen = true, onToggle }) => 
             title="Close Sidebar"
             aria-label="Close Sidebar"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={18} className="sidebar-desktop-close" />
+            <X size={18} className="sidebar-mobile-close" />
           </button>
         )}
       </div>
@@ -86,7 +87,12 @@ export const Sidebar = ({ activePage, onNavigate, isOpen = true, onToggle }) => 
             <button
               key={item.id}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => onNavigate(item.id)}
+              onClick={() => {
+                onNavigate(item.id);
+                if (typeof window !== 'undefined' && window.innerWidth <= 900 && onToggle) {
+                  onToggle();
+                }
+              }}
             >
               <div className="nav-item-left">
                 <Icon size={18} className="nav-icon" />
@@ -95,19 +101,6 @@ export const Sidebar = ({ activePage, onNavigate, isOpen = true, onToggle }) => 
             </button>
           );
         })}
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="cashier-avatar">
-          CK
-        </div>
-        <div className="cashier-info">
-          <div className="cashier-name">Cashier Counter #1</div>
-          <div className="cashier-role">
-            <CircleDot size={10} color="#16a34a" />
-            <span>Active Session</span>
-          </div>
-        </div>
       </div>
     </aside>
   );

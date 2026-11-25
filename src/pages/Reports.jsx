@@ -134,7 +134,7 @@ export const Reports = ({ bills = [], products = [], onShowToast }) => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', background: 'var(--bg-page)', padding: '4px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
               {[
                 { id: 'today', label: 'Today' },
@@ -239,7 +239,7 @@ export const Reports = ({ bills = [], products = [], onShowToast }) => {
       </div>
 
       {/* Top Selling Products & Invoices Table */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '24px' }}>
+      <div className="reports-main-grid">
         {/* Top Crackers Card */}
         <div className="transactions-card">
           <div className="card-header-flex">
@@ -271,7 +271,7 @@ export const Reports = ({ bills = [], products = [], onShowToast }) => {
                     border: '1px solid var(--border-light)'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '0.9rem', width: '20px' }}>
                       #{idx + 1}
                     </span>
@@ -311,7 +311,8 @@ export const Reports = ({ bills = [], products = [], onShowToast }) => {
             </div>
           </div>
 
-          <div className="table-responsive">
+          {/* Desktop Table View */}
+          <div className="desktop-table-view table-responsive">
             <table className="custom-table">
               <thead>
                 <tr>
@@ -357,6 +358,49 @@ export const Reports = ({ bills = [], products = [], onShowToast }) => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Cards View */}
+          <div className="mobile-cards-view">
+            {filteredBills.length === 0 ? (
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                No bills found for the selected time range.
+              </div>
+            ) : (
+              filteredBills.slice(0, 8).map(bill => (
+                <div key={bill.id} className="mobile-data-card">
+                  <div className="mobile-data-card-header">
+                    <div>
+                      <span className="invoice-link-code" style={{ fontSize: '0.78rem' }}>
+                        #{bill.invoiceNo}
+                      </span>
+                      <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-heading)', marginTop: '2px' }}>
+                        {bill.customer?.name || 'Walk-in Customer'}
+                      </strong>
+                    </div>
+                    <span className={`badge ${
+                      bill.payment?.method === 'UPI' ? 'badge-blue' :
+                      bill.payment?.method === 'Card' ? 'badge-sky' : 'badge-success'
+                    }`}>
+                      {bill.payment?.method || 'Cash'}
+                    </span>
+                  </div>
+
+                  <div className="mobile-data-card-body">
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">Date</span>
+                      <span className="mobile-data-value">{bill.date}</span>
+                    </div>
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">Total Amount</span>
+                      <span className="mobile-data-value highlight-amount">
+                        ₹{(bill.summary?.grandTotal || 0).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

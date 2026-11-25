@@ -59,8 +59,10 @@ export function App() {
   const [previewBill, setPreviewBill] = useState(null);
   const [previewFormat, setPreviewFormat] = useState('standard');
 
-  // Sidebar open/collapse state
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Sidebar open/collapse state (auto-closed on mobile/tablet, open on desktop)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth > 900 : true;
+  });
 
   // Pre-filled customer for New Billing
   const [prefilledCustomer, setPrefilledCustomer] = useState(null);
@@ -279,7 +281,16 @@ export function App() {
   };
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${previewBill ? 'has-invoice-open' : ''} ${!sidebarOpen ? 'sidebar-collapsed' : ''}`}>
+      {/* Mobile Drawer Overlay Backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="sidebar-backdrop no-print" 
+          onClick={() => setSidebarOpen(false)} 
+          aria-hidden="true" 
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <Sidebar
         activePage={activePage}

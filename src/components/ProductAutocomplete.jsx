@@ -243,11 +243,13 @@ export const ProductAutocomplete = ({
       {/* Autocomplete Dropdown Suggestions Menu */}
       {isOpen && (
         <div
+          className="product-autocomplete-dropdown"
           style={{
             position: 'absolute',
             top: 'calc(100% + 6px)',
             left: 0,
-            width: 'max(100%, 320px)',
+            width: '100%',
+            minWidth: '260px',
             maxWidth: 'min(520px, calc(100vw - 32px))',
             background: '#ffffff',
             border: '1.5px solid var(--border-dark)',

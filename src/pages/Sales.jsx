@@ -248,11 +248,7 @@ export const Sales = ({
       </div>
 
       {/* 2. Key Sales Metrics (KPI Cards) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-        gap: '16px'
-      }}>
+      <div className="sales-kpi-grid">
         {/* Total Filtered Sales Revenue */}
         <div className="billing-card" style={{ padding: '16px 20px', borderLeft: '4px solid #2563eb' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -479,7 +475,8 @@ export const Sales = ({
           overflow: 'hidden'
         }}
       >
-        <div className="table-responsive">
+        {/* Desktop Table View */}
+        <div className="desktop-table-view table-responsive">
           <table className="custom-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ background: 'var(--bg-page)', borderBottom: '1.5px solid var(--border-dark)' }}>
@@ -717,6 +714,107 @@ export const Sales = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards View */}
+        <div className="mobile-cards-view">
+          {filteredBills.length === 0 ? (
+            <div style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              No sales matching your filters.
+            </div>
+          ) : (
+            filteredBills.map((bill) => {
+              const items = bill.items || [];
+              const totalUnits = items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+              const itemsPreview = items.slice(0, 2).map(i => i.name).join(', ') + (items.length > 2 ? ` +${items.length - 2} more` : '');
+              const paymentMethod = bill.payment?.method || 'Cash';
+              const paymentStatus = bill.payment?.status || 'Paid';
+
+              return (
+                <div key={bill.id || bill.invoiceNo} className="mobile-data-card">
+                  <div className="mobile-data-card-header">
+                    <div>
+                      <span className="invoice-link-code" style={{ fontSize: '0.8rem' }}>
+                        #{bill.invoiceNo}
+                      </span>
+                      <strong style={{ display: 'block', fontSize: '0.925rem', color: 'var(--text-heading)', marginTop: '2px' }}>
+                        {bill.customer?.name || 'Walk-in Customer'}
+                      </strong>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                      <span className={`badge ${
+                        paymentMethod === 'UPI' ? 'badge-blue' :
+                        paymentMethod === 'Card' ? 'badge-sky' : 'badge-success'
+                      }`} style={{ fontSize: '0.7rem' }}>
+                        {paymentMethod}
+                      </span>
+                      <span style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        padding: '1px 6px',
+                        borderRadius: '999px',
+                        background: paymentStatus === 'Paid' ? '#ecfdf5' : '#fef2f2',
+                        color: paymentStatus === 'Paid' ? '#059669' : '#dc2626'
+                      }}>
+                        {paymentStatus}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mobile-data-card-body">
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">Date & Time</span>
+                      <span className="mobile-data-value">{bill.date} • {bill.time}</span>
+                    </div>
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">Items</span>
+                      <span className="mobile-data-value">{items.length} items ({totalUnits} units)</span>
+                    </div>
+                    <div className="mobile-data-row" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      <span>Items:</span>
+                      <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {itemsPreview}
+                      </span>
+                    </div>
+                    <div className="mobile-data-row">
+                      <span className="mobile-data-label">Grand Total</span>
+                      <span className="mobile-data-value highlight-amount">
+                        ₹{(bill.summary?.grandTotal || 0).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mobile-data-card-actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => onViewInvoice?.(bill, 'standard')}
+                    >
+                      <Eye size={13} color="#2563eb" />
+                      <span>View</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => onViewInvoice?.(bill, 'standard')}
+                    >
+                      <Printer size={13} />
+                      <span>Print</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(bill)}
+                      style={{ flex: '0 0 40px' }}
+                      title="Delete Sale"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>
