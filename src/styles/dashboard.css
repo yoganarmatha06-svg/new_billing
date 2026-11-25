@@ -1,0 +1,383 @@
+/* dashboard.css - Light Blue & White Theme */
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Quick Action Banner - Minimal & Clean White/Light Blue */
+.dashboard-hero-banner {
+  background: #ffffff;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-left h1 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.hero-left p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  max-width: 580px;
+}
+
+.hero-right-logo-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.dashboard-banner-logo {
+  width: 140px;
+  height: auto;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  border: 1px solid var(--border-dark);
+  background: #ffffff;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-actions .btn-billing {
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary-hover);
+  font-weight: 700;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.hero-actions .btn-billing:hover {
+  background: var(--primary-hover);
+  color: #ffffff;
+  border-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* KPI Cards Grid - White cards with subtle shadows */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-dark);
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--accent);
+}
+
+.kpi-card.sales::before { background-color: #2563eb; }
+.kpi-card.bills::before { background-color: #3b82f6; }
+.kpi-card.products::before { background-color: #1d4ed8; }
+.kpi-card.customers::before { background-color: #16a34a; }
+
+.kpi-info span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Deep blue headings and important amounts */
+.kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  line-height: 1.1;
+  font-family: var(--font-main);
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.trend-up {
+  color: var(--success);
+  background: var(--success-light);
+}
+
+.trend-neutral {
+  color: var(--text-muted);
+  background: var(--bg-muted);
+}
+
+.kpi-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  background-color: var(--accent-light);
+  color: var(--accent);
+}
+
+.kpi-card.sales .kpi-icon-box { background: #eff6ff; color: #2563eb; }
+.kpi-card.bills .kpi-icon-box { background: #eff6ff; color: #3b82f6; }
+.kpi-card.products .kpi-icon-box { background: #eff6ff; color: #1d4ed8; }
+.kpi-card.customers .kpi-icon-box { background: #f0fdf4; color: #16a34a; }
+
+/* Dashboard Sections Grid */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* Recent Transactions Card */
+.transactions-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-title-group h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title-group p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+
+.custom-table th {
+  background-color: var(--bg-page);
+  color: var(--text-heading);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 14px;
+  border-bottom: 1.5px solid var(--border-light);
+  text-align: left;
+}
+
+.custom-table th:first-child { border-radius: var(--radius-xs) 0 0 var(--radius-xs); }
+.custom-table th:last-child { border-radius: 0 var(--radius-xs) var(--radius-xs) 0; }
+
+.custom-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+/* Clean billing tables with light blue hover effects */
+.custom-table tr:hover td {
+  background-color: var(--bg-hover);
+}
+
+.invoice-link-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.825rem;
+}
+
+/* Side Info / Quick Category Stats */
+.dashboard-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quick-stats-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.category-stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border-light);
+}
+
+.category-stat-item:last-child {
+  border-bottom: none;
+}
+
+.cat-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.cat-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cat-bar {
+  height: 8px;
+  width: 70px;
+  background-color: var(--bg-page);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.cat-fill {
+  height: 100%;
+  background-color: var(--accent);
+  border-radius: var(--radius-full);
+}
+
+.cat-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-heading);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* Festive Tips Card - Light Blue Theme */
+.festive-safety-card {
+  background: #f0f9ff;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.festive-safety-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.festive-safety-card ul {
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.festive-safety-card li::before {
+  content: "✦ ";
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Responsive Dashboard */
+@media (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-hero-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+}
