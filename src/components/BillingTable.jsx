@@ -342,8 +342,8 @@ export const BillingTable = ({
           </div>
         </div>
 
-        {/* 3. Selected Products Table (Directly below search input) */}
-        <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
+        {/* 3. Selected Products (Table for Desktop, Cards for Mobile) */}
+        <div className="desktop-cart-table table-responsive" style={{ overflowX: 'auto', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
           <table className="cart-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.825rem' }}>
             <thead>
               <tr style={{ background: 'var(--bg-page)', borderBottom: '1.5px solid var(--border-dark)' }}>
@@ -386,9 +386,6 @@ export const BillingTable = ({
                   const maxStock = prod?.stock ?? 999;
                   const qty = Number(item.quantity) || 1;
                   const price = Number(item.price) || 0;
-                  const discPercent = Number(item.discount) || 0;
-                  const gstPercent = Number(item.gst) || 18;
-                  const calcs = calculateItemTotals(price, qty, discPercent, gstPercent);
 
                   return (
                     <tr 
@@ -488,6 +485,92 @@ export const BillingTable = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cart Cards List (Visible only on screens <= 768px) */}
+        <div className="mobile-cart-cards">
+          {items.length === 0 ? (
+            <div className="mobile-cart-empty">
+              <div style={{ color: 'var(--text-heading)', fontSize: '0.9rem', fontWeight: 700, marginBottom: '2px' }}>
+                No products added yet
+              </div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                Search and add cracker items above to build invoice.
+              </div>
+            </div>
+          ) : (
+            items.map((item, index) => {
+              const prod = availableProducts.find(p => p.id === item.id) || item;
+              const maxStock = prod?.stock ?? 999;
+              const qty = Number(item.quantity) || 1;
+              const price = Number(item.price) || 0;
+
+              return (
+                <div key={item.id} className="cart-mobile-card">
+                  <div className="cart-mobile-header">
+                    <div className="cart-mobile-title-col">
+                      <span className="cart-mobile-sno">#{index + 1}</span>
+                      <span className="cart-mobile-name" title={item.name}>{item.name}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="cart-mobile-remove-btn"
+                      onClick={() => onRemoveItem?.(item.id)}
+                      title={`Remove ${item.name}`}
+                      aria-label={`Remove ${item.name}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+
+                  <div className="cart-mobile-meta">
+                    <span className="cart-mobile-code">{item.code}</span>
+                    <span className="cart-mobile-stock">Stock: {maxStock}</span>
+                    <span className="cart-mobile-rate">Rate: ₹{price}</span>
+                  </div>
+
+                  <div className="cart-mobile-footer">
+                    <div className="qty-stepper cart-mobile-stepper">
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        onClick={() => handleQtyChange(item, qty - 1)}
+                        disabled={qty <= 1}
+                        title="Decrease quantity"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        max={maxStock}
+                        className="qty-input"
+                        value={qty}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          handleQtyChange(item, isNaN(val) ? 1 : val);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        onClick={() => handleQtyChange(item, qty + 1)}
+                        disabled={qty >= maxStock}
+                        title={qty >= maxStock ? 'Max available stock reached' : 'Increase quantity'}
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+
+                    <div className="cart-mobile-total">
+                      <span className="cart-mobile-total-label">Total:</span>
+                      <span className="cart-mobile-total-val">₹{(price * qty).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

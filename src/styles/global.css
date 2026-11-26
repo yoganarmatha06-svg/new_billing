@@ -144,6 +144,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (max-width: 360px) {
+  .page-wrapper {
+    padding: 10px 8px 24px;
+  }
+}
+
 /* Standard Minimal Buttons */
 .btn {
   display: inline-flex;

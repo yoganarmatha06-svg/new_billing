@@ -253,7 +253,7 @@ export const Sales = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
       {/* 1. Sales Header Banner */}
       <div 
-        className="billing-card" 
+        className="billing-card sales-header-banner" 
         style={{ 
           background: '#ffffff', 
           border: '1.5px solid var(--border-light)',
@@ -287,7 +287,7 @@ export const Sales = ({
           </div>
 
           {/* Top Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="sales-header-actions">
             <button
               type="button"
               className="btn btn-secondary btn-sm"
@@ -405,11 +405,11 @@ export const Sales = ({
           borderRadius: 'var(--radius-md)'
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Top Row: Search Input + Date Preset Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="sales-filter-container" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {/* Top Row: Search Input + Date Preset Pills + Custom Date */}
+          <div className="sales-filter-top-row">
             {/* Search Input */}
-            <div style={{ position: 'relative', flex: '1 1 280px' }}>
+            <div className="sales-search-input-wrapper" style={{ position: 'relative' }}>
               <Search 
                 size={16} 
                 style={{ 
@@ -432,7 +432,7 @@ export const Sales = ({
             </div>
 
             {/* Date Preset Buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <div className="sales-date-presets">
               {[
                 { id: 'ALL', label: 'All Time' },
                 { id: 'TODAY', label: 'Today' },
@@ -466,11 +466,11 @@ export const Sales = ({
             </div>
 
             {/* Custom Date Picker */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className="sales-custom-date-wrapper">
               <input
                 type="date"
                 className="form-control"
-                style={{ height: '40px', fontSize: '0.825rem', width: '150px' }}
+                style={{ height: '40px', fontSize: '0.825rem' }}
                 value={customDate}
                 onChange={(e) => {
                   setCustomDate(e.target.value);
@@ -482,14 +482,14 @@ export const Sales = ({
           </div>
 
           {/* Bottom Row: Payment Method, Status & Reset */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div className="sales-filter-bottom-row">
+            <div className="sales-filter-dropdowns">
               {/* Payment Method Selector */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div className="sales-filter-select-group">
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>Payment:</span>
                 <select
                   className="form-control"
-                  style={{ height: '36px', fontSize: '0.825rem', padding: '4px 10px', width: '130px' }}
+                  style={{ height: '36px', fontSize: '0.825rem', padding: '4px 10px' }}
                   value={paymentFilter}
                   onChange={(e) => setPaymentFilter(e.target.value)}
                 >
@@ -502,11 +502,11 @@ export const Sales = ({
               </div>
 
               {/* Status Selector */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div className="sales-filter-select-group">
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>Status:</span>
                 <select
                   className="form-control"
-                  style={{ height: '36px', fontSize: '0.825rem', padding: '4px 10px', width: '130px' }}
+                  style={{ height: '36px', fontSize: '0.825rem', padding: '4px 10px' }}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -519,7 +519,7 @@ export const Sales = ({
             </div>
 
             {/* Results Count & Reset Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="sales-filter-meta">
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Showing <strong>{filteredBills.length}</strong> of <strong>{bills.length}</strong> sales
               </span>
@@ -866,135 +866,119 @@ export const Sales = ({
               No sales matching your filters.
             </div>
           ) : (
-            filteredBills.map((bill) => {
-              const items = bill.items || [];
-              const totalUnits = items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
-              const itemsPreview = items.slice(0, 2).map(i => i.name).join(', ') + (items.length > 2 ? ` +${items.length - 2} more` : '');
-              const paymentMethod = bill.payment?.method || 'Cash';
-              const paymentStatus = bill.payment?.status || 'Paid';
-
-              return (
-                <div key={bill.id || bill.invoiceNo} className="mobile-data-card">
-                  <div className="mobile-data-card-header">
-                    <div>
-                      <span className="invoice-link-code" style={{ fontSize: '0.8rem' }}>
-                        #{bill.invoiceNo}
-                      </span>
-                      <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.925rem', color: 'var(--text-heading)', marginTop: '2px' }}>
-                        <User size={14} color="var(--primary)" />
-                        <span>{bill.customer?.name || 'Walk-in Customer'}</span>
-                      </strong>
-                      {bill.customer?.mobile && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          <Phone size={12} color="var(--accent)" />
-                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>+91 {bill.customer.mobile}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                      <span className={`badge ${
-                        paymentMethod === 'UPI' ? 'badge-blue' :
-                        paymentMethod === 'Card' ? 'badge-sky' : 'badge-success'
-                      }`} style={{ fontSize: '0.7rem' }}>
-                        {paymentMethod}
-                      </span>
-                      <span style={{
-                        fontSize: '0.68rem',
-                        fontWeight: 700,
-                        padding: '1px 6px',
-                        borderRadius: '999px',
-                        background: paymentStatus === 'Paid' ? '#ecfdf5' : '#fef2f2',
-                        color: paymentStatus === 'Paid' ? '#059669' : '#dc2626'
-                      }}>
-                        {paymentStatus}
-                      </span>
-                    </div>
+            <div className="mobile-invoice-scroll-container">
+              <div className="mobile-invoice-scroll-inner">
+                {/* Mobile Column Headers for Perfect Alignment */}
+                <div className="mobile-invoice-header-row">
+                  <div className="invoice-hdr-sec-1">
+                    <span style={{ width: '140px', textAlign: 'center' }}>BILL NUMBER</span>
+                    <span style={{ width: '130px', textAlign: 'left', paddingLeft: '6px' }}>CUSTOMER NAME</span>
+                    <span style={{ width: '130px', textAlign: 'center' }}>PHONE NUMBER</span>
                   </div>
+                  <div className="invoice-hdr-sec-2">DATE & TIME</div>
+                  <div className="invoice-hdr-sec-3">ITEMS</div>
+                  <div className="invoice-hdr-sec-4">TOTAL AMOUNT</div>
+                  <div className="invoice-hdr-sec-5">PAYMENT STATUS</div>
+                  <div className="invoice-hdr-sec-6">ACTIONS</div>
+                </div>
 
-                  <div className="mobile-data-card-body">
-                    <div className="mobile-data-row">
-                      <span className="mobile-data-label">Customer Name</span>
-                      <span className="mobile-data-value" style={{ fontWeight: 700 }}>
-                        {bill.customer?.name || 'Walk-in Customer'}
-                      </span>
-                    </div>
-                    <div className="mobile-data-row">
-                      <span className="mobile-data-label">Phone Number</span>
-                      <span className="mobile-data-value" style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent)' }}>
-                        {bill.customer?.mobile ? `+91 ${bill.customer.mobile}` : '-'}
-                      </span>
-                    </div>
-                    {bill.customer?.address && (
-                      <div className="mobile-data-row">
-                        <span className="mobile-data-label">City / Address</span>
-                        <span className="mobile-data-value" style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                          {bill.customer.address}
+                {filteredBills.map((bill) => {
+                  const items = bill.items || [];
+                  const totalUnits = items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+                  const itemsPreview = items.slice(0, 2).map(i => i.name).join(', ') + (items.length > 2 ? ` +${items.length - 2} more` : '');
+                  const paymentMethod = bill.payment?.method || 'Cash';
+                  const paymentStatus = bill.payment?.status || 'Paid';
+
+                  return (
+                    <div key={bill.id || bill.invoiceNo} className="mobile-invoice-row-card">
+                      {/* Section 1: Invoice Number, Customer Name, Phone Number */}
+                      <div className="invoice-sec-1">
+                        <span className="invoice-link-code">#{bill.invoiceNo}</span>
+                        <span className="invoice-customer-name" title={bill.customer?.name || 'Walk-in Customer'}>
+                          <User size={13} className="invoice-col-icon" />
+                          <span>{bill.customer?.name || 'Walk-in Customer'}</span>
+                        </span>
+                        {bill.customer?.mobile ? (
+                          <span className="invoice-customer-phone">
+                            <Phone size={11} className="invoice-phone-icon" />
+                            <span>+91 {bill.customer.mobile}</span>
+                          </span>
+                        ) : (
+                          <span className="invoice-phone-empty">-</span>
+                        )}
+                      </div>
+
+                      {/* Section 2: Date & Time */}
+                      <div className="invoice-sec-2">
+                        <Calendar size={12} className="invoice-col-icon" />
+                        <span>{bill.date} • {bill.time}</span>
+                      </div>
+
+                      {/* Section 3: Items Count */}
+                      <div className="invoice-sec-3">
+                        <span className="invoice-items-pill">
+                          {items.length} items ({totalUnits} units)
                         </span>
                       </div>
-                    )}
-                    <div className="mobile-data-row">
-                      <span className="mobile-data-label">Date & Time</span>
-                      <span className="mobile-data-value">{bill.date} • {bill.time}</span>
-                    </div>
-                    <div className="mobile-data-row">
-                      <span className="mobile-data-label">Items</span>
-                      <span className="mobile-data-value">{items.length} items ({totalUnits} units)</span>
-                    </div>
-                    <div className="mobile-data-row" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      <span>Items:</span>
-                      <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {itemsPreview}
-                      </span>
-                    </div>
-                    <div className="mobile-data-row">
-                      <span className="mobile-data-label">Grand Total</span>
-                      <span className="mobile-data-value highlight-amount">
-                        ₹{(bill.summary?.grandTotal || 0).toLocaleString('en-IN')}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="mobile-data-card-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', width: '100%', marginTop: '12px' }}>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => onViewInvoice?.(bill, 'standard')}
-                      style={{ justifyContent: 'center', padding: '7px 4px', fontSize: '0.75rem' }}
-                    >
-                      <Eye size={13} color="#2563eb" />
-                      <span>View</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => handleOpenEdit(bill)}
-                      style={{ justifyContent: 'center', padding: '7px 4px', fontSize: '0.75rem', color: '#1e40af', background: '#eff6ff', borderColor: '#bfdbfe' }}
-                    >
-                      <Pencil size={13} color="#2563eb" />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm"
-                      onClick={() => onViewInvoice?.(bill, 'standard')}
-                      style={{ justifyContent: 'center', padding: '7px 4px', fontSize: '0.75rem' }}
-                    >
-                      <Printer size={13} />
-                      <span>Print</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(bill)}
-                      style={{ justifyContent: 'center', padding: '7px 4px', fontSize: '0.75rem' }}
-                    >
-                      <Trash2 size={13} />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })
+                      {/* Section 4: Total Amount */}
+                      <div className="invoice-sec-4">
+                        <span className="invoice-total-amount">
+                          ₹{(bill.summary?.grandTotal || 0).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+
+                      {/* Section 5: Payment Status (Cash / Partial) */}
+                      <div className="invoice-sec-5">
+                        <span className={`badge ${
+                          paymentMethod === 'UPI' ? 'badge-blue' :
+                          paymentMethod === 'Card' ? 'badge-sky' : 'badge-success'
+                        }`}>
+                          {paymentMethod}
+                        </span>
+                        <span className={`invoice-status-pill status-${paymentStatus.toLowerCase()}`}>
+                          {paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* Section 6: View & Print Bill button */}
+                      <div className="invoice-sec-6">
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm invoice-btn-view-print"
+                          onClick={() => onViewInvoice?.(bill, 'standard')}
+                          title="View & Print Bill"
+                        >
+                          <Eye size={13} />
+                          <Printer size={13} />
+                          <span>View & Print</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm invoice-action-icon-btn"
+                          onClick={() => handleOpenEdit(bill)}
+                          title="Edit Invoice"
+                          aria-label="Edit Invoice"
+                        >
+                          <Pencil size={12} color="#2563eb" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm invoice-action-icon-btn"
+                          onClick={() => handleDelete(bill)}
+                          title="Delete Invoice"
+                          aria-label="Delete Invoice"
+                        >
+                          <Trash2 size={12} />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -1045,7 +1029,7 @@ export const Sales = ({
                 <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-heading)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '8px' }}>
                   Customer Details *
                 </span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="edit-modal-customer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
                       Customer Name *
@@ -1094,7 +1078,7 @@ export const Sales = ({
                 <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-heading)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '8px' }}>
                   Payment Information
                 </span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                <div className="edit-modal-payment-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
                       Payment Mode

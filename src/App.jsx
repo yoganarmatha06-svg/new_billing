@@ -268,6 +268,10 @@ export function App() {
     setCustomers((prev) => [newCustomer, ...prev]);
   };
 
+  const handleUpdateCustomer = (updatedCustomer) => {
+    setCustomers((prev) => prev.map((c) => c.id === updatedCustomer.id ? { ...c, ...updatedCustomer } : c));
+  };
+
   const handleDeleteCustomer = (customerId) => {
     setCustomers((prev) => prev.filter((c) => c.id !== customerId));
   };
@@ -391,6 +395,7 @@ export function App() {
             <Customers
               customers={customers}
               onAddCustomer={handleAddCustomer}
+              onUpdateCustomer={handleUpdateCustomer}
               onDeleteCustomer={handleDeleteCustomer}
               onSelectCustomerForBill={handleSelectCustomerForBill}
               onShowToast={showToast}
