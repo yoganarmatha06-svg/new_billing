@@ -37,9 +37,6 @@ export const Navbar = ({
             <div className="navbar-title">
               <span>{SHOP_DETAILS.name}</span>
             </div>
-            <div className="navbar-subtitle">
-              Point of Sale & Inventory Management • Terminal #1
-            </div>
           </div>
         </div>
       </div>
