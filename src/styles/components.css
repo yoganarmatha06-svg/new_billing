@@ -2019,7 +2019,7 @@
 
 /* Inner wrapper with fixed/suitable width so every row stays on a single line */
 .mobile-invoice-scroll-inner {
-  min-width: 1330px !important;
+  min-width: 1350px !important;
   width: max-content !important;
   display: flex !important;
   flex-direction: column !important;
@@ -2036,13 +2036,13 @@
   align-items: center !important;
   justify-content: flex-start !important;
   width: max-content !important;
-  min-width: 1330px !important;
+  min-width: 1350px !important;
   padding: 8px 16px !important;
   gap: 16px !important;
   background: var(--bg-page) !important;
   border: 1px solid var(--border-dark) !important;
   border-radius: var(--radius-xs) !important;
-  font-size: 0.72rem !important;
+  font-size: 0.8rem !important;
   font-weight: 800 !important;
   color: var(--text-heading) !important;
   text-transform: uppercase !important;
@@ -2109,12 +2109,12 @@
   align-items: center !important;
   justify-content: flex-start !important;
   width: max-content !important;
-  min-width: 1330px !important;
-  min-height: 48px !important;
+  min-width: 1350px !important;
+  min-height: 50px !important;
   background: #ffffff !important;
   border: 1px solid var(--border-light) !important;
   border-radius: var(--radius-sm) !important;
-  padding: 6px 16px !important;
+  padding: 8px 16px !important;
   gap: 16px !important;
   white-space: nowrap !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
@@ -2143,12 +2143,12 @@
 
 .invoice-sec-1 .invoice-link-code {
   font-family: var(--font-mono) !important;
-  font-size: 0.78rem !important;
+  font-size: 0.85rem !important;
   font-weight: 700 !important;
   color: var(--primary) !important;
   background: #eff6ff !important;
   border: 1px solid #bfdbfe !important;
-  padding: 3px 6px !important;
+  padding: 4px 7px !important;
   border-radius: var(--radius-xs) !important;
   width: 140px !important;
   min-width: 140px !important;
@@ -2164,8 +2164,8 @@
 .invoice-customer-name {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
-  font-size: 0.85rem !important;
+  gap: 5px !important;
+  font-size: 0.92rem !important;
   font-weight: 700 !important;
   color: var(--text-heading) !important;
   white-space: nowrap !important;
@@ -2190,7 +2190,7 @@
   justify-content: center !important;
   gap: 4px !important;
   font-family: var(--font-mono) !important;
-  font-size: 0.74rem !important;
+  font-size: 0.82rem !important;
   font-weight: 600 !important;
   color: #1e40af !important;
   background: #f1f5f9 !important;
@@ -2212,7 +2212,7 @@
 }
 
 .invoice-phone-empty {
-  font-size: 0.8rem !important;
+  font-size: 0.88rem !important;
   color: var(--text-muted) !important;
   width: 130px !important;
   min-width: 130px !important;
@@ -2236,7 +2236,7 @@
   width: 155px !important;
   min-width: 155px !important;
   max-width: 155px !important;
-  font-size: 0.76rem !important;
+  font-size: 0.84rem !important;
   color: var(--text-secondary) !important;
   line-height: 1.2 !important;
   box-sizing: border-box !important;
@@ -2258,11 +2258,11 @@
 }
 
 .invoice-items-pill {
-  font-size: 0.72rem !important;
+  font-size: 0.8rem !important;
   font-weight: 700 !important;
   background: #f8fafc !important;
   color: var(--text-heading) !important;
-  padding: 3px 8px !important;
+  padding: 4px 9px !important;
   border-radius: var(--radius-xs) !important;
   border: 1px solid var(--border-dark) !important;
   white-space: nowrap !important;
@@ -2289,7 +2289,7 @@
 .invoice-total-amount {
   font-family: var(--font-mono) !important;
   font-weight: 800 !important;
-  font-size: 0.96rem !important;
+  font-size: 1.05rem !important;
   color: var(--text-heading) !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
@@ -2313,17 +2313,17 @@
 }
 
 .invoice-sec-5 .badge {
-  font-size: 0.7rem !important;
-  padding: 2px 7px !important;
+  font-size: 0.78rem !important;
+  padding: 3px 8px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   line-height: 1.2 !important;
 }
 
 .invoice-status-pill {
-  font-size: 0.68rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
-  padding: 2px 7px !important;
+  padding: 3px 8px !important;
   border-radius: 999px !important;
   display: inline-block !important;
   white-space: nowrap !important;
@@ -2367,9 +2367,9 @@
 }
 
 .dashboard-invoice-sec-6 {
-  width: 170px !important;
-  min-width: 170px !important;
-  max-width: 170px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
 }
 
 .invoice-btn-view-print {
@@ -2378,8 +2378,8 @@
   justify-content: center !important;
   gap: 5px !important;
   min-height: 32px !important;
-  padding: 4px 10px !important;
-  font-size: 0.76rem !important;
+  padding: 5px 11px !important;
+  font-size: 0.84rem !important;
   font-weight: 700 !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
@@ -2392,8 +2392,8 @@
   justify-content: center !important;
   gap: 3px !important;
   min-height: 32px !important;
-  padding: 4px 8px !important;
-  font-size: 0.72rem !important;
+  padding: 5px 9px !important;
+  font-size: 0.8rem !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
 }
@@ -2423,7 +2423,7 @@
   width: 100% !important;
   min-width: 980px !important;
   border-collapse: collapse !important;
-  font-size: 0.825rem !important;
+  font-size: 0.88rem !important;
   white-space: nowrap !important;
 }
 
@@ -2431,7 +2431,7 @@
   background-color: var(--bg-page) !important;
   color: var(--text-heading) !important;
   font-weight: 800 !important;
-  font-size: 0.72rem !important;
+  font-size: 0.8rem !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
   padding: 12px 14px !important;
@@ -2453,13 +2453,13 @@
 }
 
 .customer-avatar-circle {
-  width: 32px !important;
-  height: 32px !important;
+  width: 34px !important;
+  height: 34px !important;
   border-radius: 50% !important;
   background: #eff6ff !important;
   color: var(--primary) !important;
   font-weight: 800 !important;
-  font-size: 0.82rem !important;
+  font-size: 0.88rem !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2472,11 +2472,11 @@
   align-items: center !important;
   gap: 5px !important;
   font-family: var(--font-mono) !important;
-  font-size: 0.78rem !important;
+  font-size: 0.84rem !important;
   font-weight: 600 !important;
   color: #1e40af !important;
   background: #eff6ff !important;
-  padding: 3px 8px !important;
+  padding: 4px 9px !important;
   border-radius: var(--radius-xs) !important;
   border: 1px solid #bfdbfe !important;
   white-space: nowrap !important;
@@ -2486,7 +2486,7 @@
   display: inline-flex !important;
   align-items: center !important;
   gap: 5px !important;
-  font-size: 0.78rem !important;
+  font-size: 0.84rem !important;
   color: var(--text-secondary) !important;
   white-space: nowrap !important;
   max-width: 170px !important;
@@ -2495,7 +2495,7 @@
 }
 
 .customer-status-pill {
-  font-size: 0.72rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   padding: 3px 9px !important;
   border-radius: 999px !important;
@@ -2523,17 +2523,17 @@
 }
 
 .customer-action-btn {
-  padding: 4px 9px !important;
-  font-size: 0.75rem !important;
+  padding: 5px 10px !important;
+  font-size: 0.82rem !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 4px !important;
   white-space: nowrap !important;
-  min-height: 28px !important;
+  min-height: 30px !important;
 }
 
 .customer-action-btn.delete-btn {
-  padding: 4px 8px !important;
+  padding: 5px 8px !important;
 }
 
 /* ==========================================================================
@@ -2572,7 +2572,7 @@
 
 .customer-header-title {
   margin: 0 !important;
-  font-size: 0.96rem !important;
+  font-size: 1.05rem !important;
   font-weight: 800 !important;
   color: var(--text-heading) !important;
   white-space: nowrap !important;
@@ -2582,7 +2582,7 @@
 }
 
 .customer-header-badge {
-  font-size: 0.72rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   padding: 2px 8px !important;
   border-radius: 999px !important;
@@ -2599,8 +2599,8 @@
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   padding: 6px 12px !important;
-  font-size: 0.8rem !important;
-  min-height: 32px !important;
+  font-size: 0.86rem !important;
+  min-height: 34px !important;
   font-weight: 700 !important;
 }
 
@@ -2623,15 +2623,15 @@
     padding: 10px 14px !important;
   }
   .customer-header-title {
-    font-size: 0.88rem !important;
+    font-size: 0.94rem !important;
   }
   .customer-header-badge {
-    font-size: 0.7rem !important;
+    font-size: 0.76rem !important;
     padding: 2px 6px !important;
   }
   .customer-header-add-btn {
-    padding: 5px 9px !important;
-    font-size: 0.76rem !important;
+    padding: 5px 10px !important;
+    font-size: 0.82rem !important;
   }
 }
 
@@ -2644,7 +2644,7 @@
     padding: 8px 10px !important;
   }
   .customer-header-title {
-    font-size: 0.82rem !important;
+    font-size: 0.88rem !important;
   }
   .customer-btn-label-desktop {
     display: none !important;

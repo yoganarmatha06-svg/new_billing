@@ -206,7 +206,7 @@ export const Customers = ({
                   return (
                     <tr key={cust.id}>
                       {/* 1. Index */}
-                      <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.8rem' }}>
+                      <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.86rem' }}>
                         {idx + 1}
                       </td>
 
@@ -217,10 +217,10 @@ export const Customers = ({
                             {cust.name?.charAt(0).toUpperCase() || 'C'}
                           </div>
                           <div>
-                            <strong style={{ color: 'var(--text-heading)', display: 'block', fontSize: '0.88rem' }}>
+                            <strong style={{ color: 'var(--text-heading)', display: 'block', fontSize: '0.94rem' }}>
                               {cust.name}
                             </strong>
-                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                               {cust.address || 'Walk-in Customer'}
                             </span>
                           </div>
@@ -245,14 +245,14 @@ export const Customers = ({
 
                       {/* 5. Total Orders */}
                       <td style={{ textAlign: 'center' }}>
-                        <span className="badge badge-sky" style={{ fontSize: '0.74rem', fontWeight: 700, padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <ShoppingBag size={11} />
+                        <span className="badge badge-sky" style={{ fontSize: '0.82rem', fontWeight: 700, padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <ShoppingBag size={12} />
                           <span>{ordersCount} orders</span>
                         </span>
                       </td>
 
                       {/* 6. Total Amount */}
-                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-heading)' }}>
+                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)' }}>
                         ₹{totalPurchases.toLocaleString('en-IN')}
                       </td>
 

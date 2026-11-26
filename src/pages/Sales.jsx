@@ -552,7 +552,7 @@ export const Sales = ({
       >
         {/* Desktop Table View */}
         <div className="desktop-table-view table-responsive" style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table className="custom-table" style={{ width: '100%', minWidth: '960px', borderCollapse: 'collapse', fontSize: '0.825rem' }}>
+          <table className="custom-table" style={{ width: '100%', minWidth: '960px', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: 'var(--bg-page)', borderBottom: '1.5px solid var(--border-dark)' }}>
                 <th style={{ width: '38px', textAlign: 'center', padding: '12px 6px', color: 'var(--text-heading)', fontWeight: 800, whiteSpace: 'nowrap' }}>
@@ -579,7 +579,7 @@ export const Sales = ({
                 <th style={{ textAlign: 'right', padding: '12px 10px', color: 'var(--text-heading)', fontWeight: 800, whiteSpace: 'nowrap', minWidth: '95px' }}>
                   Grand Total (₹)
                 </th>
-                <th style={{ textAlign: 'center', width: '185px', minWidth: '185px', padding: '12px 8px', color: 'var(--text-heading)', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                <th style={{ textAlign: 'center', width: '200px', minWidth: '200px', padding: '12px 8px', color: 'var(--text-heading)', fontWeight: 800, whiteSpace: 'nowrap' }}>
                   Actions
                 </th>
               </tr>
@@ -666,7 +666,7 @@ export const Sales = ({
                             padding: '3px 7px',
                             borderRadius: 'var(--radius-xs)',
                             border: '1px solid var(--primary-border)',
-                            fontSize: '0.78rem',
+                            fontSize: '0.84rem',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
@@ -676,7 +676,7 @@ export const Sales = ({
                           <FileText size={12} style={{ flexShrink: 0 }} />
                           <span>#{bill.invoiceNo}</span>
                         </span>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '3px', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '3px', whiteSpace: 'nowrap' }}>
                           {bill.date} • {bill.time}
                         </div>
                       </td>
@@ -685,14 +685,14 @@ export const Sales = ({
                       <td style={{ padding: '10px 10px', verticalAlign: 'middle' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                           <User size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
-                          <span style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.85rem' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.92rem' }}>
                             {bill.customer?.name || 'Walk-in Customer'}
                           </span>
                         </div>
                         {bill.customer?.address && (
                           <div 
                             title={bill.customer.address}
-                            style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px', paddingLeft: '18px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                            style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px', paddingLeft: '18px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                           >
                             {bill.customer.address}
                           </div>
@@ -708,7 +708,7 @@ export const Sales = ({
                               alignItems: 'center',
                               gap: '4px',
                               fontFamily: 'var(--font-mono)',
-                              fontSize: '0.78rem',
+                              fontSize: '0.84rem',
                               fontWeight: 600,
                               color: '#1e40af',
                               background: '#eff6ff',
@@ -722,7 +722,7 @@ export const Sales = ({
                             <span>+91 {bill.customer.mobile}</span>
                           </span>
                         ) : (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>-</span>
+                          <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>-</span>
                         )}
                       </td>
 
@@ -731,7 +731,7 @@ export const Sales = ({
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                           <span 
                             style={{
-                              fontSize: '0.72rem',
+                              fontSize: '0.78rem',
                               fontWeight: 700,
                               background: '#f1f5f9',
                               color: 'var(--text-heading)',
@@ -747,7 +747,7 @@ export const Sales = ({
                         <div 
                           title={items.map(i => `${i.name} (x${i.quantity || 1})`).join(', ')}
                           style={{
-                            fontSize: '0.74rem',
+                            fontSize: '0.8rem',
                             color: 'var(--text-muted)',
                             marginTop: '2px',
                             maxWidth: '180px',
@@ -767,7 +767,7 @@ export const Sales = ({
                             paymentMethod === 'UPI' ? 'badge-blue' :
                             paymentMethod === 'Card' ? 'badge-sky' : 'badge-success'
                           }`}
-                          style={{ fontSize: '0.74rem', padding: '3px 8px', display: 'inline-block' }}
+                          style={{ fontSize: '0.8rem', padding: '3px 8px', display: 'inline-block' }}
                         >
                           {paymentMethod}
                         </span>
@@ -777,7 +777,7 @@ export const Sales = ({
                       <td style={{ textAlign: 'center', padding: '10px 8px', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                         <span 
                           style={{
-                            fontSize: '0.74rem',
+                            fontSize: '0.8rem',
                             fontWeight: 700,
                             padding: '3px 8px',
                             borderRadius: 'var(--radius-full)',
@@ -793,11 +793,11 @@ export const Sales = ({
 
                       {/* 8. Total Amount */}
                       <td style={{ textAlign: 'right', padding: '10px 10px', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-heading)' }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)' }}>
                           ₹{(bill.summary?.grandTotal || 0).toLocaleString('en-IN')}
                         </div>
                         {bill.summary?.discountAmount > 0 && (
-                          <div style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 600, marginTop: '1px' }}>
+                          <div style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 600, marginTop: '1px' }}>
                             Disc: -₹{bill.summary.discountAmount}
                           </div>
                         )}
@@ -810,7 +810,7 @@ export const Sales = ({
                             type="button"
                             className="btn btn-secondary btn-sm"
                             onClick={() => onViewInvoice?.(bill, 'standard')}
-                            style={{ padding: '5px 7px', fontSize: '0.72rem', gap: '3px' }}
+                            style={{ padding: '5px 8px', fontSize: '0.78rem', gap: '3px' }}
                             title="View Bill Details"
                           >
                             <Eye size={12} color="#2563eb" />
@@ -821,7 +821,7 @@ export const Sales = ({
                             type="button"
                             className="btn btn-secondary btn-sm"
                             onClick={() => handleOpenEdit(bill)}
-                            style={{ padding: '5px 7px', fontSize: '0.72rem', gap: '3px', color: '#1e40af', background: '#eff6ff', borderColor: '#bfdbfe' }}
+                            style={{ padding: '5px 8px', fontSize: '0.78rem', gap: '3px', color: '#1e40af', background: '#eff6ff', borderColor: '#bfdbfe' }}
                             title="Edit Customer, Payment & Bill Details"
                           >
                             <Pencil size={12} color="#2563eb" />
@@ -832,7 +832,7 @@ export const Sales = ({
                             type="button"
                             className="btn btn-primary btn-sm"
                             onClick={() => onViewInvoice?.(bill, 'standard')}
-                            style={{ padding: '5px 7px', fontSize: '0.72rem', gap: '3px' }}
+                            style={{ padding: '5px 8px', fontSize: '0.78rem', gap: '3px' }}
                             title="Print Original Invoice"
                           >
                             <Printer size={12} />
@@ -843,7 +843,7 @@ export const Sales = ({
                             type="button"
                             className="btn btn-sm"
                             onClick={() => handleDelete(bill)}
-                            style={{ padding: '5px 7px', fontSize: '0.72rem', gap: '3px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}
+                            style={{ padding: '5px 8px', fontSize: '0.78rem', gap: '3px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}
                             title="Delete Sale (Restores Stock)"
                           >
                             <Trash2 size={12} />
