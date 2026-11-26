@@ -211,29 +211,34 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
     <div className="estimate-bill-sheet print-area-wrapper">
       <table className="estimate-main-table">
         <colgroup>
-          <col style={{ width: '6%' }} />
+          <col style={{ width: '7%' }} />
+          <col style={{ width: '9%' }} />
+          <col style={{ width: '44%' }} />
           <col style={{ width: '8%' }} />
-          <col style={{ width: '48%' }} />
-          <col style={{ width: '6%' }} />
           <col style={{ width: '16%' }} />
           <col style={{ width: '16%' }} />
         </colgroup>
 
         <tbody>
-          {/* Row 1: Header (Shop Name on left, Phone/Email on right) */}
+          {/* Row 1: Header (Shop Name & Address on left, Phone/Email on right) */}
           <tr className="row-header">
             <td colSpan={4} className="cell-shop-info">
               <h1 className="estimate-shop-name">
                 {SHOP_DETAILS.name || 'NEW BILLING'}
               </h1>
+              {SHOP_DETAILS.address && (
+                <div className="estimate-shop-address" style={{ fontSize: '10.5px', marginTop: '3px', fontWeight: 600, color: '#333' }}>
+                  {SHOP_DETAILS.address}
+                </div>
+              )}
             </td>
             <td colSpan={2} className="cell-contact-info">
               <div className="contact-line">
-                <Phone size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <Phone size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', flexShrink: 0 }} />
                 <span>{SHOP_DETAILS.phone || '9988765543'}</span>
               </div>
               <div className="contact-line" style={{ marginTop: '5px' }}>
-                <Mail size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <Mail size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', flexShrink: 0 }} />
                 <span>{SHOP_DETAILS.email || 'newbillng@gmail.com'}</span>
               </div>
             </td>
@@ -276,10 +281,10 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
           <tr className="row-table-headers">
             <th style={{ textAlign: 'center' }}>S.No.</th>
             <th style={{ textAlign: 'center' }}>Code</th>
-            <th style={{ textAlign: 'center' }}>Product</th>
+            <th style={{ textAlign: 'left', paddingLeft: '8px' }}>Product</th>
             <th style={{ textAlign: 'center' }}>Qty</th>
-            <th style={{ textAlign: 'center' }}>Rate (Rs.) / Content</th>
-            <th style={{ textAlign: 'center' }}>Total ₹</th>
+            <th style={{ textAlign: 'center' }}>Rate (Rs.) / Unit</th>
+            <th style={{ textAlign: 'right', paddingRight: '8px' }}>Total ₹</th>
           </tr>
 
           {/* Item Rows */}
@@ -296,7 +301,9 @@ export const PrintBill = ({ bill, format = 'standard' }) => {
               <tr key={idx} className="row-item">
                 <td style={{ textAlign: 'center' }}>{idx + 1}</td>
                 <td style={{ textAlign: 'center', fontWeight: 800 }}>{code}</td>
-                <td style={{ textAlign: 'left', paddingLeft: '8px' }}>{item.name}</td>
+                <td style={{ textAlign: 'left', paddingLeft: '8px' }}>
+                  <div className="item-name-text">{item.name}</div>
+                </td>
                 <td style={{ textAlign: 'center', fontWeight: 800 }}>{qty}</td>
                 <td style={{ textAlign: 'center', fontWeight: 700 }}>
                   {price} / {unit}

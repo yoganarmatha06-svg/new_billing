@@ -645,7 +645,7 @@
 
 /* Filler Row for continuous lines */
 .row-filler td {
-  height: 380px !important;
+  height: clamp(40px, 20vh, 240px) !important;
   padding: 0 !important;
   vertical-align: top;
   line-height: 1;
@@ -1147,10 +1147,10 @@
 
 @media (max-width: 768px) {
   .invoice-modal-header {
-    padding: 14px 16px;
+    padding: 12px 14px;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
   }
 
   .invoice-modal-actions {
@@ -1167,20 +1167,218 @@
   .format-btn {
     flex: 1;
     text-align: center;
+    padding: 6px 8px;
+    font-size: 0.72rem;
   }
 
   .invoice-preview-modal-content {
-    max-height: 96vh;
+    max-height: 98vh;
+    width: 98%;
+    margin: 0 auto;
+    border-radius: var(--radius-sm);
   }
 
   .invoice-modal-body {
-    padding: 12px 8px;
+    padding: 8px 4px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    display: block;
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg-page);
+    box-sizing: border-box;
+    min-height: auto;
   }
 
   .estimate-bill-sheet {
-    min-width: 580px;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 4px 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  .estimate-main-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .estimate-main-table td,
+  .estimate-main-table th {
+    padding: 3px 2px !important;
+    font-size: 10px !important;
+  }
+
+  .estimate-shop-name {
+    font-size: 16px !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .estimate-shop-address {
+    font-size: 9px !important;
+  }
+
+  .cell-contact-info {
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+  }
+
+  .contact-line {
+    font-size: 9px !important;
+    gap: 4px !important;
+  }
+
+  .cell-customer {
+    padding: 4px 6px !important;
+    font-size: 9.5px !important;
+  }
+
+  .customer-name {
+    font-size: 11px !important;
+  }
+
+  .customer-sub {
+    padding-left: 0 !important;
+    font-size: 9px !important;
+  }
+
+  .cell-meta {
+    padding: 4px 6px !important;
+    font-size: 9.5px !important;
+  }
+
+  .meta-line {
+    font-size: 9px !important;
+    gap: 3px !important;
+  }
+
+  .row-table-headers th {
+    font-size: 9.5px !important;
+    padding: 4px 2px !important;
+  }
+
+  .row-item td {
+    height: auto !important;
+    padding: 3px 2px !important;
+  }
+
+  .item-name-text {
+    font-size: 9.5px !important;
+    line-height: 1.25 !important;
+    word-break: break-word;
+  }
+
+  .row-filler td {
+    height: 35px !important;
+  }
+
+  .cell-sum-label {
+    font-size: 9.5px !important;
+    padding: 3px 4px !important;
+  }
+
+  .cell-sum-val {
+    font-size: 9.5px !important;
+    padding: 3px 4px !important;
+  }
+
+  .net-label {
+    font-size: 10.5px !important;
+  }
+
+  .net-val {
+    font-size: 11.5px !important;
+  }
+
+  .thermal-receipt {
+    width: 100% !important;
+    max-width: 320px !important;
+    padding: 14px 10px !important;
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .invoice-modal-header {
+    padding: 10px 10px;
+  }
+
+  .invoice-modal-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .invoice-modal-body {
+    padding: 4px 2px;
+  }
+
+  .estimate-bill-sheet {
+    padding: 2px !important;
+  }
+
+  .estimate-main-table td,
+  .estimate-main-table th {
+    padding: 2px 1.5px !important;
+    font-size: 8.5px !important;
+  }
+
+  .estimate-shop-name {
+    font-size: 13.5px !important;
+  }
+
+  .cell-contact-info {
+    font-size: 8px !important;
+    padding: 2px 4px !important;
+  }
+
+  .contact-line {
+    font-size: 8px !important;
+  }
+
+  .cell-customer {
+    font-size: 8.5px !important;
+    padding: 2px 4px !important;
+  }
+
+  .customer-name {
+    font-size: 10px !important;
+  }
+
+  .cell-meta {
+    font-size: 8.5px !important;
+    padding: 2px 4px !important;
+  }
+
+  .meta-line {
+    font-size: 8px !important;
+  }
+
+  .row-table-headers th {
+    font-size: 8.5px !important;
+    padding: 3px 1.5px !important;
+  }
+
+  .item-name-text {
+    font-size: 8.5px !important;
+  }
+
+  .row-filler td {
+    height: 25px !important;
+  }
+
+  .cell-sum-label {
+    font-size: 8.5px !important;
+    padding: 2px 3px !important;
+  }
+
+  .cell-sum-val {
+    font-size: 8.5px !important;
+    padding: 2px 3px !important;
+  }
+
+  .net-label {
+    font-size: 9.5px !important;
+  }
+
+  .net-val {
+    font-size: 10.5px !important;
   }
 }

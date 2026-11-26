@@ -70,6 +70,9 @@ export function App() {
   // Quick product to bill
   const [quickProduct, setQuickProduct] = useState(null);
 
+  // Active bill being edited in New Billing
+  const [editingBill, setEditingBill] = useState(null);
+
   // Toast notification state
   const [toast, setToast] = useState(null);
 
@@ -198,6 +201,14 @@ export function App() {
     const updated = salesService.deleteSale(billId);
     setBills(updated);
     showToast(`Invoice #${billToDelete.invoiceNo} deleted & stock restored`, 'info');
+  };
+
+  // Bill update handler (modifies existing bill in permanent storage)
+  const handleUpdateBill = (updatedBill) => {
+    if (!updatedBill || !updatedBill.invoiceNo) return;
+    const updated = salesService.updateSale(updatedBill);
+    setBills(updated);
+    showToast(`Invoice #${updatedBill.invoiceNo} updated successfully`, 'success');
   };
 
   // Product management handlers
@@ -338,6 +349,9 @@ export function App() {
               customers={customers}
               onSaveCustomer={handleSaveCustomerRecord}
               onSaveBill={handleSaveBill}
+              onUpdateBill={handleUpdateBill}
+              editingBill={editingBill}
+              onClearEditingBill={() => setEditingBill(null)}
               prefilledCustomer={prefilledCustomer}
               quickProduct={quickProduct}
               onClearQuickProduct={() => setQuickProduct(null)}
@@ -351,6 +365,12 @@ export function App() {
               bills={bills}
               onViewInvoice={handleOpenInvoice}
               onDeleteBill={handleDeleteBill}
+              onUpdateBill={handleUpdateBill}
+              onEditBill={(bill) => {
+                setEditingBill(bill);
+                setActivePage('new-billing');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               onNavigate={setActivePage}
               onShowToast={showToast}
             />

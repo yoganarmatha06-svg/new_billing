@@ -36,7 +36,12 @@ export const CustomerDetails = ({
       <div className="customer-compact-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <User size={15} color="#2563eb" />
-          <span className="customer-compact-title">Customer Information</span>
+          <span className="customer-compact-title">
+            Customer Information <span style={{ color: 'var(--danger)', fontWeight: 800 }}>*</span>
+          </span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            (* Required)
+          </span>
         </div>
 
         {isSaved && (
@@ -61,26 +66,41 @@ export const CustomerDetails = ({
       <div className="customer-compact-grid">
         {/* Customer Name */}
         <div className="compact-field">
+          <label htmlFor="customer-name-input" className="compact-field-label">
+            Customer Name <span style={{ color: 'var(--danger)', fontWeight: 800 }}>*</span>
+          </label>
           <input
+            id="customer-name-input"
             type="text"
-            className="form-control form-control-sm"
-            placeholder="Customer Name..."
+            className={`form-control form-control-sm ${errors.name ? 'error' : ''}`}
+            placeholder="Enter customer name *"
             value={customer.name || ''}
             onChange={(e) => onChange({ ...customer, name: e.target.value })}
+            required
           />
+          {errors.name && (
+            <span className="error-text" style={{ color: 'var(--danger)', fontSize: '0.7rem', marginTop: '2px', display: 'block' }}>
+              {errors.name}
+            </span>
+          )}
         </div>
 
         {/* Mobile Number (+91) */}
         <div className="compact-field">
+          <label htmlFor="customer-mobile-input" className="compact-field-label">
+            Mobile Number <span style={{ color: 'var(--danger)', fontWeight: 800 }}>*</span>
+          </label>
           <div className="phone-input-wrapper compact-phone-wrapper">
             <span className="phone-prefix compact-prefix">+91</span>
             <input
+              id="customer-mobile-input"
               type="tel"
               className={`form-control phone-control form-control-sm ${errors.mobile ? 'error' : ''}`}
-              placeholder="Mobile (10 digits)..."
+              placeholder="10 digits *"
               maxLength={10}
               value={customer.mobile || ''}
               onChange={handleMobileChange}
+              required
             />
             {errors.mobile ? (
               <AlertCircle size={14} className="phone-invalid-icon" />
@@ -99,18 +119,31 @@ export const CustomerDetails = ({
 
         {/* Customer Address */}
         <div className="compact-field">
+          <label htmlFor="customer-address-input" className="compact-field-label">
+            City / Address <span style={{ color: 'var(--danger)', fontWeight: 800 }}>*</span>
+          </label>
           <input
+            id="customer-address-input"
             type="text"
-            className="form-control form-control-sm"
-            placeholder="City / Address..."
+            className={`form-control form-control-sm ${errors.address ? 'error' : ''}`}
+            placeholder="City / Address *"
             value={customer.address || ''}
             onChange={(e) => onChange({ ...customer, address: e.target.value })}
+            required
           />
+          {errors.address && (
+            <span className="error-text" style={{ color: 'var(--danger)', fontSize: '0.7rem', marginTop: '2px', display: 'block' }}>
+              {errors.address}
+            </span>
+          )}
         </div>
 
         {/* Optional Save Details Button */}
         {(customer.name?.trim() || customer.mobile?.trim()) && (
           <div className="compact-field compact-action-field">
+            <label className="compact-field-label" style={{ visibility: 'hidden', userSelect: 'none' }}>
+              Save
+            </label>
             <button
               type="button"
               className="btn btn-secondary btn-sm compact-save-btn"

@@ -69,6 +69,23 @@ export const salesService = {
   },
 
   /**
+   * Updates an existing sale in localStorage
+   * @param {Object} updatedBill 
+   * @returns {Array} Updated sales list
+   */
+  updateSale: (updatedBill) => {
+    if (!updatedBill || !updatedBill.invoiceNo) {
+      return salesService.getSales();
+    }
+    const currentSales = salesService.getSales();
+    const updated = currentSales.map((b) => 
+      (b.id === updatedBill.id || b.invoiceNo === updatedBill.invoiceNo) ? updatedBill : b
+    );
+    salesService.saveAllSales(updated);
+    return updated;
+  },
+
+  /**
    * Deletes a sale by ID or invoice number from localStorage
    * @param {string} billId 
    * @returns {Array} Updated sales list

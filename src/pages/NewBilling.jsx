@@ -17,6 +17,9 @@ export const NewBilling = ({
   customers = [],
   onSaveCustomer,
   onSaveBill,
+  onUpdateBill,
+  editingBill = null,
+  onClearEditingBill,
   prefilledCustomer = null,
   quickProduct = null,
   onClearQuickProduct,
@@ -110,35 +113,110 @@ export const NewBilling = ({
     }
   }, [prefilledCustomer]);
 
+  // Handle editing bill passed from Sales
+  useEffect(() => {
+    if (editingBill) {
+      if (editingBill.invoiceNo) setInvoiceNo(editingBill.invoiceNo);
+      if (editingBill.customer) {
+        setCustomer({
+          name: editingBill.customer.name || '',
+          mobile: editingBill.customer.mobile || '',
+          address: editingBill.customer.address || '',
+          gstNo: editingBill.customer.gstNo || ''
+        });
+        setIsCustomerSaved(true);
+        setSavedCustomerInfo(editingBill.customer);
+      }
+      if (editingBill.items && Array.isArray(editingBill.items)) {
+        setCartItems(editingBill.items);
+      }
+      if (editingBill.summary?.discountRate !== undefined) {
+        setCustomDiscountValue(String(editingBill.summary.discountRate));
+        setDiscountType(editingBill.summary.discountType || 'percent');
+      }
+      if (editingBill.payment?.method) {
+        setPaymentMethod(editingBill.payment.method);
+      }
+      if (editingBill.payment?.status) {
+        setPaymentStatus(editingBill.payment.status);
+      }
+      if (editingBill.summary?.paidAmount !== undefined) {
+        setAmountPaid(editingBill.summary.paidAmount);
+      }
+      setCustomerErrors({});
+      onShowToast?.(`Loaded Invoice #${editingBill.invoiceNo} for editing`, 'info');
+    }
+  }, [editingBill]);
+
   // Customer modification handler: update state freely and clear errors on edit
   const handleCustomerChange = (updatedCustomer) => {
     setCustomer(updatedCustomer);
-    if (customerErrors.mobile) {
-      setCustomerErrors(prev => {
-        const next = { ...prev };
-        delete next.mobile;
-        return next;
-      });
-    }
+    setCustomerErrors(prev => {
+      const next = { ...prev };
+      if (updatedCustomer.name?.trim()) delete next.name;
+      if (updatedCustomer.mobile?.trim()) delete next.mobile;
+      if (updatedCustomer.address?.trim()) delete next.address;
+      return next;
+    });
   };
 
-  // Save Customer Handler (validates mobile upon saving)
-  const handleSaveCustomer = () => {
+  // Validate Customer Information (Required fields: Name, 10-digit Mobile & Address)
+  const validateCustomer = () => {
+    const cleanName = (customer.name || '').trim();
     const rawMobile = customer.mobile || '';
     const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
-    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
-      setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
-      onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
-      return;
+    const cleanAddress = (customer.address || '').trim();
+
+    const errors = {};
+    if (!cleanName) {
+      errors.name = 'Customer name is required *';
     }
+
+    if (!rawMobile.trim()) {
+      errors.mobile = 'Mobile number is required *';
+    } else if (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile)) {
+      errors.mobile = 'Please enter a valid 10-digit Indian mobile number';
+    }
+
+    if (!cleanAddress) {
+      errors.address = 'City / Address is required *';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setCustomerErrors(errors);
+      if (errors.name) {
+        onShowToast?.('Customer Name is required *', 'danger');
+        document.getElementById('customer-name-input')?.focus();
+      } else if (errors.mobile) {
+        onShowToast?.(errors.mobile, 'danger');
+        document.getElementById('customer-mobile-input')?.focus();
+      } else if (errors.address) {
+        onShowToast?.('City / Address is required *', 'danger');
+        document.getElementById('customer-address-input')?.focus();
+      }
+      return false;
+    }
+
+    setCustomerErrors({});
+    return true;
+  };
+
+  // Save Customer Handler (validates customer information upon saving)
+  const handleSaveCustomer = () => {
+    if (!validateCustomer()) return;
+
+    const rawMobile = customer.mobile || '';
+    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
 
     const customerToSave = {
       ...customer,
-      mobile: cleanMobile || customer.mobile?.trim() || ''
+      name: customer.name.trim(),
+      mobile: cleanMobile || customer.mobile?.trim() || '',
+      address: customer.address?.trim() || ''
     };
 
     let savedRecord = null;
-    if (onSaveCustomer && (customerToSave.name || customerToSave.mobile)) {
+    if (onSaveCustomer) {
       savedRecord = onSaveCustomer(customerToSave);
     }
 
@@ -151,11 +229,7 @@ export const NewBilling = ({
     }
 
     setCustomer(customerToSave);
-    setCustomerErrors(prev => {
-      const next = { ...prev };
-      delete next.mobile;
-      return next;
-    });
+    setCustomerErrors({});
     setIsCustomerSaved(true);
     setSavedCustomerInfo(savedRecord);
     onShowToast?.('Customer Details Saved', 'success');
@@ -397,16 +471,14 @@ export const NewBilling = ({
   const handleGenerateBill = () => {
     if (isSubmitting) return;
 
-    if (cartItems.length === 0) {
-      onShowToast?.('Please add at least one cracker to the bill before generating', 'danger');
+    // 1. Validate Customer Information first (Required)
+    if (!validateCustomer()) {
       return;
     }
 
-    const rawMobile = customer.mobile || '';
-    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
-    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
-      setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
-      onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
+    // 2. Validate Cart Items
+    if (cartItems.length === 0) {
+      onShowToast?.('Please add at least one cracker to the bill before generating', 'danger');
       return;
     }
 
@@ -416,9 +488,16 @@ export const NewBilling = ({
       const newBill = buildInvoiceObject(invoiceNo);
 
       // Automatically save sales record permanently and update inventory
-      onSaveBill?.(newBill);
+      if (editingBill) {
+        onUpdateBill?.(newBill);
+        onClearEditingBill?.();
+        onShowToast?.(`Invoice #${newBill.invoiceNo} Updated Successfully`, 'success');
+      } else {
+        onSaveBill?.(newBill);
+        onShowToast?.('Bill Saved Successfully', 'success');
+      }
 
-      // If customer details were entered, save them to the customers directory
+      // Save customer to the customers directory
       if (newBill.customer.name && onSaveCustomer) {
         onSaveCustomer(newBill.customer);
       }
@@ -466,18 +545,16 @@ export const NewBilling = ({
     }
   };
 
-  // Button 3: Print Invoice (Works with or without customer information)
+  // Button 3: Print Invoice (Requires customer information and at least one item)
   const handlePrintInvoice = () => {
-    if (cartItems.length === 0) {
-      onShowToast?.('Please add at least one cracker to the bill before printing', 'danger');
+    // 1. Validate Customer Information first (Required)
+    if (!validateCustomer()) {
       return;
     }
 
-    const rawMobile = customer.mobile || '';
-    const cleanMobile = rawMobile.replace(/\D/g, '').slice(-10);
-    if (rawMobile.trim() && (cleanMobile.length !== 10 || !/^[6-9]\d{9}$/.test(cleanMobile))) {
-      setCustomerErrors(prev => ({ ...prev, mobile: 'Please enter a valid 10-digit Indian mobile number' }));
-      onShowToast?.('Please enter a valid 10-digit Indian mobile number', 'danger');
+    // 2. Validate Cart Items
+    if (cartItems.length === 0) {
+      onShowToast?.('Please add at least one cracker to the bill before printing', 'danger');
       return;
     }
 
@@ -535,6 +612,45 @@ export const NewBilling = ({
             </div>
           </div>
         </div>
+
+        {/* Editing Banner */}
+        {editingBill && (
+          <div style={{
+            margin: '12px 20px 0',
+            background: '#eff6ff',
+            border: '1.5px solid #93c5fd',
+            borderRadius: 'var(--radius-sm)',
+            padding: '10px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.1rem' }}>✏️</span>
+              <div>
+                <strong style={{ color: '#1e40af', fontSize: '0.875rem' }}>
+                  Editing Invoice #{editingBill.invoiceNo}
+                </strong>
+                <span style={{ fontSize: '0.75rem', color: '#2563eb', display: 'block' }}>
+                  Customer details, items, quantities and payment will be updated for this invoice.
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                onClearEditingBill?.();
+                handleClearAll();
+              }}
+              style={{ fontSize: '0.75rem', padding: '5px 12px' }}
+            >
+              Cancel Edit
+            </button>
+          </div>
+        )}
 
         {/* Section 1: Customer Information (Reduced Size Compact Strip) */}
         <div className="unified-customer-section">

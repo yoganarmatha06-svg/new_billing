@@ -463,6 +463,12 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 768px) {
   .mobile-cards-view {
     display: flex !important;
@@ -570,12 +576,13 @@ h1, h2, h3, h4, h5, h6 {
 @media print {
   @page {
     size: auto;
-    margin: 8mm 10mm;
+    margin: 6mm 8mm;
   }
 
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    box-sizing: border-box !important;
   }
 
   html, body {
@@ -589,6 +596,7 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Hide navigation, sidebar, action buttons and toasts */
   .app-sidebar,
+  .sidebar-backdrop,
   .app-navbar,
   .no-print,
   .invoice-modal-header,
@@ -596,6 +604,7 @@ h1, h2, h3, h4, h5, h6 {
   .invoice-modal-actions,
   .toast-container,
   .btn,
+  button,
   .modal-overlay:not(.print-mode-modal) {
     display: none !important;
   }
@@ -625,7 +634,8 @@ h1, h2, h3, h4, h5, h6 {
   .print-area-wrapper {
     display: block !important;
     width: 100% !important;
-    margin: 0 !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
     padding: 0 !important;
   }
 
@@ -656,9 +666,12 @@ h1, h2, h3, h4, h5, h6 {
 
   .invoice-modal-body {
     padding: 0 !important;
+    margin: 0 !important;
     background: transparent !important;
     display: block !important;
     min-height: auto !important;
+    overflow: visible !important;
+    width: 100% !important;
   }
 
   .estimate-bill-sheet {
@@ -667,24 +680,45 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 100% !important;
     width: 100% !important;
     padding: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .estimate-main-table {
     width: 100% !important;
+    max-width: 100% !important;
     border-collapse: collapse !important;
     border: 1.5px solid #000000 !important;
     page-break-inside: avoid;
+    break-inside: avoid;
+    table-layout: fixed !important;
   }
 
   .estimate-main-table td,
   .estimate-main-table th {
     border: 1.5px solid #000000 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .estimate-shop-name {
+    font-size: 20px !important;
+  }
+
+  .estimate-shop-address {
+    font-size: 9.5px !important;
+  }
+
+  .row-filler td {
+    height: 70px !important;
   }
 
   .estimate-main-table tr {
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .tax-invoice-sheet {
@@ -695,6 +729,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 20px 24px !important;
     border-radius: 0 !important;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .thermal-receipt {
@@ -707,6 +742,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 4px 6px !important;
     font-size: 10px !important;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .invoice-table {
@@ -720,6 +756,7 @@ h1, h2, h3, h4, h5, h6 {
 
   .invoice-bottom-grid {
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 }
 

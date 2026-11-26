@@ -45,6 +45,10 @@ export const Customers = ({
       onShowToast?.('Enter a valid 10-digit mobile number', 'danger');
       return;
     }
+    if (!newCust.address.trim()) {
+      onShowToast?.('Address / Location is required', 'danger');
+      return;
+    }
 
     const created = {
       ...newCust,
@@ -294,11 +298,12 @@ export const Customers = ({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Address / Location</label>
+                  <label className="form-label">Address / Location *</label>
                   <input
                     type="text"
                     className="form-control"
                     placeholder="e.g. 15 Gandhi Street, Madurai"
+                    required
                     value={newCust.address}
                     onChange={e => setNewCust({ ...newCust, address: e.target.value })}
                   />
